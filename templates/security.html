@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="nav_security">Bảo mật PDF</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=1.2">
+    <script src="/static/js/i18n.js?v=1.4"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span data-i18n="nav_app_title">PDF Tools</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/split-merge" class="nav-link" data-i18n="nav_split_merge">Tách / Nối PDF</a></li>
+                <li class="nav-item"><a href="/editor" class="nav-link" data-i18n="nav_editor">Chỉnh sửa PDF</a></li>
+                <li class="nav-item"><a href="/compress" class="nav-link" data-i18n="nav_compress">Nén PDF</a></li>
+                <li class="nav-item"><a href="/security" class="nav-link active" data-i18n="nav_security" style="color: var(--primary-color);">Bảo mật PDF</a></li>
+            </ul>
+            
+            <!-- Language Toggle Button -->
+            <button class="lang-toggle" onclick="toggleLang()" data-i18n="lang_switch_btn">🇯🇵 日本語</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h1 data-i18n="nav_security">Bảo mật PDF</h1>
+            
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="protect" data-i18n="tab_protect">Khóa PDF</button>
+                <button class="tab-btn" data-tab="unlock" data-i18n="tab_unlock">Gỡ mật khẩu</button>
+            </div>
+
+            <!-- PROTECT TAB -->
+            <div id="protect" class="tab-content active">
+                <h2 data-i18n="tab_protect">Đặt mật khẩu PDF</h2>
+                <p data-i18n="protect_desc" style="color: #666; margin-bottom: 1.5rem;">Bảo vệ file PDF của bạn bằng mật khẩu mã hóa AES-128</p>
+                
+                <div class="upload-area" id="protectUploadArea">
+                    <p data-i18n="upload_hint">Kéo thả file PDF vào đây hoặc click để chọn</p>
+                    <input type="file" id="protectFileInput" accept=".pdf" style="display:none;">
+                </div>
+                
+                <div id="protectFileInfo" class="file-info" style="display:none;">
+                    <p>File: <span id="protectFileName"></span></p>
+                </div>
+                
+                <div class="form-group" style="max-width: 400px;">
+                    <label data-i18n="password_label">Nhập mật khẩu</label>
+                    <input type="password" id="protectPassword" placeholder="Nhập mật khẩu cần đặt" data-i18n-placeholder="password_protect_hint">
+                </div>
+                
+                <div class="button-group">
+                    <button id="protectBtn" class="btn btn-primary" data-i18n="btn_protect">🔒 KHÓA PDF</button>
+                </div>
+                
+                <div id="protectResult" style="display:none; text-align: left; margin-top: 1.5rem; background: #e6f7e6; border-left: 4px solid var(--success-color); padding: 1rem; border-radius: 4px;">
+                    <a id="protectDownloadBtn" class="btn btn-success" data-i18n="btn_download">Tải xuống</a>
+                </div>
+            </div>
+
+            <!-- UNLOCK TAB -->
+            <div id="unlock" class="tab-content">
+                <h2 data-i18n="tab_unlock">Gỡ mật khẩu PDF</h2>
+                <p data-i18n="unlock_desc" style="color: #666; margin-bottom: 1.5rem;">Gỡ bỏ hoàn toàn mật khẩu khỏi file PDF nếu bạn có mật khẩu đúng</p>
+                
+                <div class="upload-area" id="unlockUploadArea">
+                    <p data-i18n="upload_hint">Kéo thả file PDF vào đây hoặc click để chọn</p>
+                    <input type="file" id="unlockFileInput" accept=".pdf" style="display:none;">
+                </div>
+                
+                <div id="unlockFileInfo" class="file-info" style="display:none;">
+                    <p>File: <span id="unlockFileName"></span></p>
+                </div>
+                
+                <div class="form-group" style="max-width: 400px;">
+                    <label data-i18n="password_current_label">Nhập mật khẩu hiện tại của file</label>
+                    <input type="password" id="unlockPassword" placeholder="Nhập mật khẩu để mở file" data-i18n-placeholder="password_unlock_hint">
+                </div>
+                
+                <div class="button-group">
+                    <button id="unlockBtn" class="btn btn-primary" data-i18n="btn_unlock">🔓 MỞ KHÓA PDF</button>
+                </div>
+                
+                <div id="unlockResult" style="display:none; text-align: left; margin-top: 1.5rem; background: #e6f7e6; border-left: 4px solid var(--success-color); padding: 1rem; border-radius: 4px;">
+                    <a id="unlockDownloadBtn" class="btn btn-success" data-i18n="btn_download">Tải xuống</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p data-i18n="footer_text">Hệ thống nội bộ — Chỉ dành cho nhân viên công ty</p>
+    </footer>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add("remove");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+    <script src="/static/js/security.js?v=1.0"></script>
+</body>
+</html>

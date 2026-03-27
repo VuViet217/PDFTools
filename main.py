@@ -13,6 +13,7 @@ from contextlib import asynccontextmanager
 from routers.split_merge import router as split_merge_router
 from routers.editor import router as editor_router
 from routers.compress import router as compress_router
+from routers.security import router as security_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -73,6 +74,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.include_router(split_merge_router, prefix="/api", tags=["split_merge"])
 app.include_router(editor_router, prefix="/api", tags=["editor"])
 app.include_router(compress_router, prefix="/api", tags=["compress"])
+app.include_router(security_router, prefix="/api", tags=["security"])
 
 # Root route - serve index.html
 @app.get("/", response_class=HTMLResponse)
@@ -96,6 +98,12 @@ async def editor_page():
 @app.get("/compress", response_class=HTMLResponse)
 async def compress_page():
     with open("templates/compress.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# Security page
+@app.get("/security", response_class=HTMLResponse)
+async def security_page():
+    with open("templates/security.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Health check

@@ -9,6 +9,7 @@ const TRANSLATIONS = {
     nav_split_merge:     "Tách / Nối PDF",
     nav_editor:          "Chỉnh sửa PDF",
     nav_compress:        "Nén PDF",
+    nav_security:        "Bảo mật",
     lang_switch_btn:     "🇯🇵 日本語",
 
     // Trang Split/Merge
@@ -66,6 +67,18 @@ const TRANSLATIONS = {
     compress_desc:       "Giảm dung lượng file PDF tối đa mà vẫn giữ chất lượng tốt",
     upload_compress_hint:"Kéo thả file PDF vào đây hoặc click để chọn",
     btn_compress:        "NÉN PDF",
+    
+    // Security
+    tab_protect:         "Khóa PDF",
+    tab_unlock:          "Gỡ mật khẩu",
+    protect_desc:        "Bảo vệ file PDF của bạn bằng mật khẩu mã hóa AES-128",
+    unlock_desc:         "Gỡ bỏ hoàn toàn mật khẩu khỏi file PDF nếu bạn có mật khẩu đúng",
+    password_label:      "Nhập mật khẩu",
+    password_current_label: "Nhập mật khẩu hiện tại của file",
+    password_protect_hint:"Nhập mật khẩu cần đặt",
+    password_unlock_hint: "Nhập mật khẩu để mở file",
+    btn_protect:         "🔒 KHÓA PDF",
+    btn_unlock:          "🔓 MỞ KHÓA PDF",
   },
 
   ja: {
@@ -74,6 +87,7 @@ const TRANSLATIONS = {
     nav_split_merge:     "分割 / 結合",
     nav_editor:          "PDF 編集",
     nav_compress:        "PDF 圧縮",
+    nav_security:        "セキュリティ",
     lang_switch_btn:     "🇻🇳 Tiếng Việt",
 
     // Split/Merge
@@ -131,6 +145,18 @@ const TRANSLATIONS = {
     compress_desc:       "品質を保ちながらPDFのファイルサイズを縮小します",
     upload_compress_hint:"PDFファイルをここにドラッグするか、クリックして選択",
     btn_compress:        "PDFを圧縮",
+    
+    // Security
+    tab_protect:         "PDFをロック",
+    tab_unlock:          "パスワード解除",
+    protect_desc:        "AES-128暗号化パスワードでPDFファイルを保護します",
+    unlock_desc:         "正しいパスワードをお持ちの場合、PDFからパスワードを完全に削除します",
+    password_label:      "パスワードを入力",
+    password_current_label: "現在のパスワードを入力",
+    password_protect_hint:"設定するパスワードを入力",
+    password_unlock_hint: "ファイルを開くためのパスワードを入力",
+    btn_protect:         "🔒 ロック",
+    btn_unlock:          "🔓 解除",
   }
 };
 
