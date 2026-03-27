@@ -188,7 +188,7 @@ async def editor_apply_endpoint(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/editor/cleanup")
-@router.get("/editor/cleanup")
+@router.post("/editor/cleanup")
 async def editor_cleanup_endpoint(session_id: str):
     """Cleanup session resources - Nhận GET và POST"""
     try:

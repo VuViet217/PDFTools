@@ -65,6 +65,12 @@
                 setTimeout(() => toast.remove(), 300);
             }, 4000);
         }
+
+        // Tự động dọn dẹp file tạm khi người dùng đóng tab/trình duyệt
+        window.addEventListener("beforeunload", function() {
+            // Sử dụng sendBeacon để đảm bảo request được gửi ngay cả khi trang đang đóng
+            navigator.sendBeacon("/api/cleanup");
+        });
     </script>
 </body>
 </html>

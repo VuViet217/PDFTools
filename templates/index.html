@@ -91,6 +91,11 @@
                 setTimeout(() => toast.remove(), 300);
             }, 4000);
         }
+
+        // Tự động dọn dẹp file tạm khi người dùng đóng tab
+        window.addEventListener("beforeunload", function() {
+            navigator.sendBeacon("/api/cleanup");
+        });
     </script>
 </body>
 </html>
