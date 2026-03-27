@@ -31,6 +31,7 @@ const TRANSLATIONS = {
     // Trang Editor
     editor_title:        "Chỉnh sửa PDF",
     upload_pdf_editor:   "Upload PDF để bắt đầu chỉnh sửa",
+    btn_insert_pdf:      "➕ Chèn PDF",
     btn_rotate:          "Xoay 90°",
     btn_delete_page:     "Xoá trang",
     btn_insert_here:     "Chèn vào đây",
@@ -83,6 +84,7 @@ const TRANSLATIONS = {
     // Editor
     editor_title:        "PDF 編集",
     upload_pdf_editor:   "編集するPDFをアップロード",
+    btn_insert_pdf:      "➕ PDF 挿入",
     btn_rotate:          "90°回転",
     btn_delete_page:     "ページ削除",
     btn_insert_here:     "ここに挿入",

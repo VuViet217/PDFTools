@@ -22,6 +22,8 @@ const deleteBlankBtn = document.getElementById("deleteBlankBtn");
 const reverseBtn = document.getElementById("reverseBtn");
 const bulkDeleteBtn = document.getElementById("bulkDeleteBtn");
 const exportBtn = document.getElementById("exportBtn");
+const insertPdfBtn = document.getElementById("insertPdfBtn");
+const insertFileInput = document.getElementById("insertFileInput");
 
 // Preview Modal Setup
 const previewModal = document.getElementById("previewModal");
@@ -226,6 +228,7 @@ async function handleEditorUpload(file) {
     }
     
     // An toàn: không xoá thẻ <input>, chỉ lấy thẻ <p> để update Text
+    const editorUploadArea = document.getElementById("editorUploadArea");
     const textElem = editorUploadArea.querySelector("p");
     const oldText = textElem ? textElem.textContent : "Upload PDF để bắt đầu chỉnh sửa";
     if (textElem) textElem.textContent = t("processing") || "Đang xử lý...";
@@ -273,6 +276,59 @@ async function handleEditorUpload(file) {
         if (textElem) textElem.textContent = oldText;
         editorUploadArea.style.opacity = "1";
         editorUploadArea.style.pointerEvents = "auto";
+    }
+}
+
+async function handleInsertPdf(file) {
+    if (!sessionId) return;
+    
+    if (file.type !== "application/pdf") {
+        showToast(t("toast_error") || "Chỉ hỗ trợ file PDF", "error");
+        return;
+    }
+    
+    if (file.size > 50 * 1024 * 1024) {
+        showToast(t("toast_file_large") || "File quá lớn", "error");
+        return;
+    }
+
+    showToast(t("processing") || "Đang xử lý...", "info");
+    
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("session_id", sessionId); // Gửi id báo cho Server biết gộp vào phiên nào
+        
+        const response = await fetch("/api/editor/insert", {
+            method: "POST",
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || t("toast_error"));
+        }
+        
+        const result = await response.json();
+        
+        // Cập nhật State nội bộ
+        const oldTotal = totalPages;
+        totalPages = result.total_pages; // Tổng số trang mới
+        
+        // Thêm hình thu nhỏ mới nối tiếp vào cuối danh sách
+        thumbnails = thumbnails.concat(result.new_thumbnails);
+        
+        // Thêm các số trang mới vào pageOrder để hiển thị
+        for (let i = oldTotal + 1; i <= totalPages; i++) {
+            pageOrder.push(i);
+        }
+        
+        showToast(t("toast_process_ok") || "Chèn PDF thành công", "success");
+        
+        // Vẽ lại grid hiển thị toàn bộ trang
+        renderThumbnails();
+    } catch (err) {
+        showToast(err.message || t("toast_error"), "error");
     }
 }
 
@@ -492,6 +548,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnBulkDelete = document.getElementById("bulkDeleteBtn");
     const btnDeleteBlank = document.getElementById("deleteBlankBtn");
     const btnExport = document.getElementById("exportBtn");
+    const btnInsertPdf = document.getElementById("insertPdfBtn");
+
+    if (btnInsertPdf) {
+        btnInsertPdf.addEventListener("click", () => {
+            if (insertFileInput) insertFileInput.click();
+        });
+    }
+
+    if (insertFileInput) {
+        insertFileInput.addEventListener("change", (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                handleInsertPdf(e.target.files[0]);
+                e.target.value = ''; // Reset
+            }
+        });
+    }
 
     if (btnSelectAll) btnSelectAll.addEventListener("click", () => {
         selectedPages.clear();

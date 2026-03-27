@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="nav_editor">Chỉnh sửa PDF</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <script src="/static/js/i18n.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css?v=1.1">
+    <script src="/static/js/i18n.js?v=1.1"></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -49,6 +49,11 @@
                     <button id="rotateBtn" class="btn btn-small" data-i18n="btn_rotate">Xoay 90°</button>
                     <button id="deleteBlankBtn" class="btn btn-small" data-i18n="btn_delete_blank">🗑 Xoá trang trắng</button>
                     <button id="reverseBtn" class="btn btn-small" data-i18n="btn_reverse">↕ Đảo thứ tự</button>
+                    
+                    <!-- Nút chèn file PDF mới (đứng trước nút Xóa) -->
+                    <button id="insertPdfBtn" class="btn btn-small" data-i18n="btn_insert_pdf">➕ Chèn PDF</button>
+                    <input type="file" id="insertFileInput" accept=".pdf" style="display:none;">
+                    
                     <button id="bulkDeleteBtn" class="btn btn-small btn-danger" data-i18n="bulk_delete">Xoá các trang đã chọn</button>
                 </div>
                 
@@ -111,6 +116,6 @@
             }, 4000);
         }
     </script>
-    <script src="/static/js/editor.js"></script>
+    <script src="/static/js/editor.js?v=1.3"></script>
 </body>
 </html>

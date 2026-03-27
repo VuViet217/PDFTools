@@ -140,6 +140,90 @@ async def upload_pdf_editor(file_path: str, session_id: str = None) -> dict:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+async def insert_pdf_editor(session_id: str, file_path: str) -> dict:
+    """
+    Chèn thêm một file PDF mới vào cuối file đang chỉnh sửa
+    """
+    try:
+        if session_id not in SESSIONS:
+            return {"success": False, "error": "Session không tồn tại"}
+            
+        session = SESSIONS[session_id]
+        
+        # Gộp file mới vào pdf_data hiện tại trên RAM
+        old_pdf_data = session["pdf_data"]
+        old_reader = PdfReader(io.BytesIO(old_pdf_data))
+        new_reader = PdfReader(file_path)
+        
+        writer = PdfWriter()
+        # Thêm các trang cũ
+        for page in old_reader.pages:
+            writer.add_page(page)
+            
+        # Thêm các trang mới
+        new_pages_count = len(new_reader.pages)
+        for page in new_reader.pages:
+            writer.add_page(page)
+            
+        output_buffer = io.BytesIO()
+        writer.write(output_buffer)
+        output_buffer.seek(0)
+        
+        session["pdf_data"] = output_buffer.getvalue()
+        
+        # Tạo thumbnails chỉ cho các trang mới
+        start_idx = session["total_pages"]
+        session["total_pages"] += new_pages_count
+        
+        new_thumbnails = []
+        try:
+            with pdfium.PdfDocument(file_path) as pdf:
+                for idx in range(new_pages_count):
+                    page_idx = start_idx + idx
+                    try:
+                        page = pdf.get_page(idx)
+                        
+                        pil_preview = page.render(scale=2.5).to_pil()
+                        pil_preview.thumbnail((1200, 1600), Image.Resampling.LANCZOS)
+                        preview_filename = f".preview_{session_id}_{page_idx}.png"
+                        preview_path = Path("uploads") / preview_filename
+                        pil_preview.save(preview_path, format="PNG")
+                        session["thumbnails_files"].append(str(preview_path))
+                        
+                        pil_thumb = pil_preview.copy()
+                        pil_thumb.thumbnail((150, 200), Image.Resampling.LANCZOS)
+                        thumb_filename = f".thumb_{session_id}_{page_idx}.png"
+                        thumb_path = Path("uploads") / thumb_filename
+                        pil_thumb.save(thumb_path, format="PNG")
+                        session["thumbnails_files"].append(str(thumb_path))
+                        
+                        thumb_obj = {
+                            "thumb": f"/uploads/{thumb_filename}",
+                            "preview": f"/uploads/{preview_filename}"
+                        }
+                        session["thumbnails"].append(thumb_obj)
+                        new_thumbnails.append(thumb_obj)
+                    except Exception as e:
+                        svg_data = f'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="200"%3E%3Crect fill="%23f5f5f5" width="150" height="200"/%3E%3Ctext x="50%" y="50%" font-size="14" text-anchor="middle" dominant-baseline="middle" fill="%23999"%3EPage {page_idx + 1}%3C/text%3E%3C/svg%3E'
+                        obj = {"thumb": svg_data, "preview": svg_data}
+                        session["thumbnails"].append(obj)
+                        new_thumbnails.append(obj)
+        except Exception as thumb_err:
+            for idx in range(new_pages_count):
+                page_idx = start_idx + idx
+                svg_data = f'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="200"%3E%3Crect fill="%23f5f5f5" width="150" height="200"/%3E%3Ctext x="50%" y="50%" font-size="14" text-anchor="middle" dominant-baseline="middle" fill="%23999"%3EPage {page_idx + 1}%3C/text%3E%3C/svg%3E'
+                obj = {"thumb": svg_data, "preview": svg_data}
+                session["thumbnails"].append(obj)
+                new_thumbnails.append(obj)
+                
+        return {
+            "success": True,
+            "new_thumbnails": new_thumbnails,
+            "total_pages": session["total_pages"]
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 async def apply_operations(session_id: str, operations: list) -> dict:
     """
     Áp dụng các thao tác chỉnh sửa lên PDF dựa trên state cuối cùng

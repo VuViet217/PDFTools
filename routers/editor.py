@@ -4,13 +4,13 @@ API Router - PDF Editor endpoints
 import os
 import tempfile
 import time
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Form
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from pathlib import Path
 from typing import List, Dict, Any
 
-from services.pdf_editor import upload_pdf_editor, apply_operations, cleanup_session
+from services.pdf_editor import upload_pdf_editor, apply_operations, cleanup_session, insert_pdf_editor
 
 router = APIRouter()
 
@@ -71,6 +71,49 @@ async def editor_upload_endpoint(file: UploadFile = File(...)):
                     os.unlink(tmp_path)
             except Exception as e:
                 print(f"Không thể xóa file tạm {tmp_path}: {e}")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/editor/insert")
+async def editor_insert_endpoint(
+    session_id: str = Form(...),
+    file: UploadFile = File(...)
+):
+    """
+    Chèn thêm một file PDF mới vào session đang chỉnh sửa
+    """
+    try:
+        if file.content_type not in ["application/pdf"]:
+            raise HTTPException(status_code=400, detail="File phải là PDF")
+        
+        contents = await file.read()
+        if len(contents) > 50 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail="File quá lớn (max 50MB)")
+        
+        # Lưu file tạm thứ 2
+        tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
+        try:
+            with os.fdopen(tmp_fd, 'wb') as tmp:
+                tmp.write(contents)
+                
+            result = await insert_pdf_editor(session_id, tmp_path)
+            
+            if not result["success"]:
+                raise HTTPException(status_code=400, detail=result.get("error", "Lỗi chèn PDF"))
+            
+            return {
+                "total_pages": result["total_pages"],
+                "new_thumbnails": result["new_thumbnails"]
+            }
+        finally:
+            try:
+                if os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
+            except Exception as e:
+                pass
     
     except HTTPException:
         raise
