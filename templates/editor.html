@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="nav_editor">Chỉnh sửa PDF</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/i18n.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span data-i18n="nav_app_title">PDF Tools</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/split-merge" class="nav-link" data-i18n="nav_split_merge">Tách / Nối PDF</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/editor" class="nav-link" data-i18n="nav_editor">Chỉnh sửa PDF</a>
+                </li>
+            </ul>
+            
+            <!-- Language Toggle Button -->
+            <button class="lang-toggle" onclick="toggleLang()" data-i18n="lang_switch_btn">🇯🇵 日本語</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h1 data-i18n="editor_title">Chỉnh sửa PDF</h1>
+            
+            <!-- Upload area (initial state) -->
+            <div id="editorUploadArea" class="upload-area">
+                <p data-i18n="upload_pdf_editor">Upload PDF để bắt đầu chỉnh sửa</p>
+                <input type="file" id="editorFileInput" accept=".pdf" style="display:none;">
+            </div>
+            
+            <!-- Editor main (hidden initially) -->
+            <div id="editorMain" style="display:none;">
+                <!-- Toolbar -->
+                <div class="editor-toolbar">
+                    <button id="selectAllBtn" class="btn btn-small" data-i18n="select_all">Chọn tất cả</button>
+                    <button id="deselectAllBtn" class="btn btn-small" data-i18n="deselect_all">Bỏ chọn tất cả</button>
+                    <button id="rotateBtn" class="btn btn-small" data-i18n="btn_rotate">Xoay 90°</button>
+                    <button id="deleteBlankBtn" class="btn btn-small" data-i18n="btn_delete_blank">🗑 Xoá trang trắng</button>
+                    <button id="reverseBtn" class="btn btn-small" data-i18n="btn_reverse">↕ Đảo thứ tự</button>
+                    <button id="bulkDeleteBtn" class="btn btn-small btn-danger" data-i18n="bulk_delete">Xoá các trang đã chọn</button>
+                </div>
+                
+                <!-- Thumbnails grid -->
+                <div id="editorThumbnails" class="editor-thumbnails">
+                    <!-- Thumbnails will be generated here -->
+                </div>
+                
+                <!-- Export button -->
+                <div class="button-group">
+                    <button id="exportBtn" class="btn btn-primary" data-i18n="btn_export">📄 Xuất PDF</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal">
+        <!-- Close Button -->
+        <span class="modal-close">&times;</span>
+        
+        <!-- Zoom Controls Header -->
+        <div class="modal-header-controls">
+            <span id="previewCaption"></span>
+            <div class="zoom-controls">
+                <button id="zoomOutBtn" class="btn btn-secondary" title="Thu nhỏ">➖</button>
+                <span id="zoomLevel">100%</span>
+                <button id="zoomInBtn" class="btn btn-secondary" title="Phóng to">➕</button>
+                <button id="zoomResetBtn" class="btn btn-secondary" title="Vừa vặn">↺</button>
+            </div>
+        </div>
+
+        <!-- Image Container -->
+        <div id="previewContainer" class="preview-container">
+            <img class="modal-content" id="previewImage">
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p data-i18n="footer_text">Hệ thống nội bộ — Chỉ dành cho nhân viên công ty</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script>
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add("remove");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+    <script src="/static/js/editor.js"></script>
+</body>
+</html>

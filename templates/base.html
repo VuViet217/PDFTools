@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="nav_app_title">PDF Tools</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Import i18n trước mọi script khác -->
+    <script src="/static/js/i18n.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span data-i18n="nav_app_title">PDF Tools</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/split-merge" class="nav-link" data-i18n="nav_split_merge">Tách / Nối PDF</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/editor" class="nav-link" data-i18n="nav_editor">Chỉnh sửa PDF</a>
+                </li>
+            </ul>
+            
+            <!-- Language Toggle Button -->
+            <button class="lang-toggle" onclick="toggleLang()" data-i18n="lang_switch_btn">🇯🇵 日本語</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page content will be injected here by route handlers -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p data-i18n="footer_text">Hệ thống nội bộ — Chỉ dành cho nhân viên công ty</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Toast Script -->
+    <script>
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            // Auto remove after 4s
+            setTimeout(() => {
+                toast.classList.add("remove");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

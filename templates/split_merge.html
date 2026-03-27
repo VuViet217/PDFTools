@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="nav_split_merge">Tách / Nối PDF</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/i18n.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span data-i18n="nav_app_title">PDF Tools</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/split-merge" class="nav-link" data-i18n="nav_split_merge">Tách / Nối PDF</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/editor" class="nav-link" data-i18n="nav_editor">Chỉnh sửa PDF</a>
+                </li>
+            </ul>
+            
+            <!-- Language Toggle Button -->
+            <button class="lang-toggle" onclick="toggleLang()" data-i18n="lang_switch_btn">🇯🇵 日本語</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h1 data-i18n="nav_split_merge">Tách / Nối PDF</h1>
+            
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="split" data-i18n="tab_split">Tách PDF</button>
+                <button class="tab-btn" data-tab="merge" data-i18n="tab_merge">Nối PDF</button>
+            </div>
+
+            <!-- SPLIT TAB -->
+            <div id="split" class="tab-content active">
+                <h2 data-i18n="tab_split">Tách PDF</h2>
+                
+                <!-- Upload area -->
+                <div class="upload-area" id="splitUploadArea">
+                    <p data-i18n="upload_hint">Kéo thả file PDF vào đây hoặc click để chọn</p>
+                    <input type="file" id="splitFileInput" accept=".pdf" style="display:none;">
+                </div>
+                
+                <!-- File info -->
+                <div id="splitFileInfo" class="file-info" style="display:none;">
+                    <p>File: <span id="splitFileName"></span></p>
+                    <p>Số trang: <span id="splitPageCount"></span></p>
+                </div>
+                
+                <!-- Pages input -->
+                <div class="form-group">
+                    <label data-i18n="pages_label">Nhập nhóm trang</label>
+                    <input type="text" id="splitPagesInput" 
+                        placeholder="VD: 1,2-3,4-6" 
+                        data-i18n-placeholder="pages_label"
+                        title="Mỗi nhóm cách nhau dấu phẩy">
+                    <small data-i18n="pages_hint">Mỗi nhóm cách nhau dấu phẩy • Bỏ trống = tách từng trang</small>
+                </div>
+                
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button id="splitBtn" class="btn btn-primary" data-i18n="btn_split">TÁCH PDF</button>
+                </div>
+                
+                <!-- Result -->
+                <div id="splitResult" style="display:none;">
+                    <h3 data-i18n="split_result_title">Kết quả tách PDF</h3>
+                    <a id="splitDownloadBtn" class="btn btn-success" data-i18n="btn_download">Tải xuống</a>
+                </div>
+            </div>
+
+            <!-- MERGE TAB -->
+            <div id="merge" class="tab-content">
+                <h2 data-i18n="tab_merge">Nối PDF</h2>
+                
+                <!-- File list -->
+                <div id="mergeFileList" class="merge-file-list">
+                    <p data-i18n="file_list_label" style="color: #999; text-align: center;">Danh sách file</p>
+                </div>
+                
+                <!-- Add file button -->
+                <div class="button-group">
+                    <button id="mergeAddBtn" class="btn btn-secondary" data-i18n="btn_add_file">➕ Thêm PDF</button>
+                    <input type="file" id="mergeFileInput" accept=".pdf" style="display:none;" multiple>
+                </div>
+                
+                <!-- Merge button -->
+                <div class="button-group">
+                    <button id="mergeBtn" class="btn btn-primary" data-i18n="btn_merge">🔗 NỐI PDF</button>
+                </div>
+                
+                <!-- Result -->
+                <div id="mergeResult" style="display:none;">
+                    <a id="mergeDownloadBtn" class="btn btn-success" data-i18n="btn_download">Tải xuống</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p data-i18n="footer_text">Hệ thống nội bộ — Chỉ dành cho nhân viên công ty</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script>
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add("remove");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+    <script src="/static/js/split_merge.js"></script>
+</body>
+</html>
