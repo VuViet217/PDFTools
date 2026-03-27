@@ -24,32 +24,60 @@ logger = logging.getLogger(__name__)
 UPLOADS_DIR = Path("uploads")
 UPLOADS_DIR.mkdir(exist_ok=True)
 
-# Hàm chạy ngầm dọn rác định kỳ (Mỗi 10 phút dọn 1 lần các file quá cũ)
+# Hàm chạy ngầm dọn rác định kỳ (Mỗi 5 phút dọn 1 lần các file quá cũ - nhanh hơn cho image files)
 def cleanup_old_files():
     try:
         now = time.time()
         count = 0
-        # Dọn file cũ hơn 10 phút (600 giây) - thích hợp cho file tạm thời
+        total_size = 0
+        # Dọn file cũ hơn 5 phút (300 giây) cho image converter files
         for filename in os.listdir(UPLOADS_DIR):
             file_path = os.path.join(UPLOADS_DIR, filename)
             if os.path.isfile(file_path):
-                if os.stat(file_path).st_mtime < now - 600:
+                file_age = now - os.stat(file_path).st_mtime
+                # Dọn file .zip sau 60 giây, file khác sau 300 giây (5 phút)
+                max_age = 60 if filename.endswith('.zip') else 300
+                
+                if file_age > max_age:
                     try:
+                        file_size = os.path.getsize(file_path)
                         os.remove(file_path)
                         count += 1
-                    except:
-                        pass
+                        total_size += file_size
+                    except Exception as e:
+                        logger.debug(f"Failed to delete {filename}: {e}")
+        
         if count > 0:
-            logger.info(f"✨ Đã tự động dọn dẹp {count} file cũ!")
+            size_mb = total_size / (1024 * 1024)
+            logger.info(f"✨ Auto cleanup: Deleted {count} files ({size_mb:.1f}MB)")
     except Exception as e:
         logger.debug(f"Cleanup error: {e}")
+
+
+# Background cleanup task
+async def background_cleanup():
+    """Run cleanup every 5 minutes in the background"""
+    while True:
+        try:
+            await asyncio.sleep(300)  # 5 minutes
+            cleanup_old_files()
+        except Exception as e:
+            logger.debug(f"Background cleanup error: {e}")
+
 
 # Lifespan context
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("✅ PDF Tools App started")
-    cleanup_old_files() # Dọn rác một lần lúc khởi động server
+    cleanup_old_files()  # Clean once on startup
+    
+    # Start background cleanup task
+    cleanup_task = asyncio.create_task(background_cleanup())
+    
     yield
+    
+    # Cancel cleanup task on shutdown
+    cleanup_task.cancel()
     logger.info("🛑 PDF Tools App shutdown")
 
 # Initialize FastAPI app
