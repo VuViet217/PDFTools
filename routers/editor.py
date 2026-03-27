@@ -3,7 +3,8 @@ API Router - PDF Editor endpoints
 """
 import os
 import tempfile
-from fastapi import APIRouter, UploadFile, File, HTTPException
+import time
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from pathlib import Path
@@ -19,6 +20,16 @@ UPLOADS_DIR.mkdir(exist_ok=True)
 class OperationRequest(BaseModel):
     session_id: str
     operations: List[Dict[str, Any]]
+
+def remove_file(path: str):
+    """Xóa file sau khi gửi"""
+    try:
+        time.sleep(5)
+        if os.path.exists(path):
+            os.remove(path)
+            print(f"Đã dọn dẹp: {path}")
+    except:
+        pass
 
 @router.post("/editor/upload")
 async def editor_upload_endpoint(file: UploadFile = File(...)):
@@ -67,7 +78,10 @@ async def editor_upload_endpoint(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/editor/apply")
-async def editor_apply_endpoint(req: OperationRequest):
+async def editor_apply_endpoint(
+    req: OperationRequest,
+    background_tasks: BackgroundTasks
+):
     """
     Áp dụng các operations chỉnh sửa
     
@@ -95,6 +109,9 @@ async def editor_apply_endpoint(req: OperationRequest):
         with open(pdf_path, "wb") as f:
             f.write(result["output_pdf"])
         
+        # Thêm task xóa file kết quả sau 5 giây gửi về
+        background_tasks.add_task(remove_file, str(pdf_path))
+        
         return FileResponse(pdf_path, filename=result["filename"], media_type="application/pdf")
     
     except HTTPException:
@@ -102,9 +119,10 @@ async def editor_apply_endpoint(req: OperationRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/editor/cleanup")
+@router.get("/editor/cleanup")
+@router.get("/editor/cleanup")
 async def editor_cleanup_endpoint(session_id: str):
-    """Cleanup session resources"""
+    """Cleanup session resources - Nhận GET và POST"""
     try:
         cleanup_session(session_id)
         return {"success": True}

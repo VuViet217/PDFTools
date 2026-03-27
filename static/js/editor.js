@@ -220,7 +220,11 @@ async function handleEditorUpload(file) {
         showToast(t("toast_file_large") || "File quá lớn", "error");
         return;
     }
-
+    
+    if (sessionId) {
+        triggerCleanup(); // Xóa rác cũ ngay
+    }
+    
     // An toàn: không xoá thẻ <input>, chỉ lấy thẻ <p> để update Text
     const textElem = editorUploadArea.querySelector("p");
     const oldText = textElem ? textElem.textContent : "Upload PDF để bắt đầu chỉnh sửa";
@@ -464,6 +468,20 @@ function renderThumbnails() {
 function addOperation(op) {
     operations.push(op);
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// CLEANUP SESSION WHEN LEAVING PAGE OR UPLOADING NEW FILE
+// ════════════════════════════════════════════════════════════════════════════
+function triggerCleanup() {
+    if (sessionId) {
+        // Gửi lệnh xóa rác nhẹ nhàng không cần đợi phản hồi
+        navigator.sendBeacon(`/api/editor/cleanup?session_id=${sessionId}`);
+        sessionId = null;
+    }
+}
+
+// Khi người dùng đóng tab hoặc chuyển sang trang khác
+window.addEventListener("beforeunload", triggerCleanup);
 
 document.addEventListener("DOMContentLoaded", () => {
     // Buttons

@@ -3,7 +3,8 @@ API Router - Split & Merge PDF endpoints
 """
 import os
 import tempfile
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+import asyncio
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
 from pathlib import Path
 
@@ -15,8 +16,21 @@ router = APIRouter()
 UPLOADS_DIR = Path("uploads")
 UPLOADS_DIR.mkdir(exist_ok=True)
 
+def remove_file(path: str):
+    """Hàm background để xóa file sau khi đã tải xuống"""
+    try:
+        import time
+        # Đợi 5 giây đảm bảo mạng truyền xong file về client rồi mới xóa
+        time.sleep(5) 
+        if os.path.exists(path):
+            os.remove(path)
+            print(f"Đã xoá rác: {path}")
+    except Exception as e:
+        print(f"Lỗi khi xoá {path}: {e}")
+
 @router.post("/split")
 async def split_endpoint(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     pages: str = Form("")
 ):
@@ -57,6 +71,9 @@ async def split_endpoint(
             with open(zip_path, "wb") as f:
                 f.write(result["output_zip"])
             
+            # Lên lịch tự động xoá ZIP sau khi tải về
+            background_tasks.add_task(remove_file, str(zip_path))
+            
             return FileResponse(zip_path, filename=result["filename"], media_type="application/zip")
         
         finally:
@@ -93,7 +110,10 @@ async def get_pdf_info(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/merge")
-async def merge_endpoint(files: list[UploadFile] = File(...)):
+async def merge_endpoint(
+    background_tasks: BackgroundTasks,
+    files: list[UploadFile] = File(...)
+):
     """
     API endpoint nối PDF
     
@@ -133,6 +153,9 @@ async def merge_endpoint(files: list[UploadFile] = File(...)):
             pdf_path = UPLOADS_DIR / result["filename"]
             with open(pdf_path, "wb") as f:
                 f.write(result["output_pdf"])
+            
+            # Lên lịch tự động xoá file kết quả sau khi gửi
+            background_tasks.add_task(remove_file, str(pdf_path))
             
             return FileResponse(pdf_path, filename=result["filename"], media_type="application/pdf")
         

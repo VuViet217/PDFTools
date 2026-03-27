@@ -201,6 +201,16 @@ def get_session(session_id: str):
     return SESSIONS.get(session_id)
 
 def cleanup_session(session_id: str):
-    """Xoá session"""
+    """Xoá session và toàn bộ file rác thủ công ngay lập tức"""
     if session_id in SESSIONS:
+        # Xoá files ảnh tạm trên ổ cứng
+        try:
+            for thumb_path in SESSIONS[session_id].get("thumbnails_files", []):
+                if os.path.exists(thumb_path):
+                    os.unlink(thumb_path)
+        except Exception as e:
+            print(f"Lỗi khi xoá ảnh tạm: {e}")
+            
+        # Xoá session trên RAM
         del SESSIONS[session_id]
+        print(f"Đã xoá ngay lập tức session: {session_id}")
