@@ -25,6 +25,7 @@ const exportBtn = document.getElementById("exportBtn");
 const insertPdfBtn = document.getElementById("insertPdfBtn");
 const insertFileInput = document.getElementById("insertFileInput");
 const btnInsertBlank = document.getElementById("insertBlankBtn");
+const btnWatermark = document.getElementById("watermarkBtn");
 
 // Preview Modal Setup
 const previewModal = document.getElementById("previewModal");
@@ -36,10 +37,16 @@ const zoomOutBtn = document.getElementById("zoomOutBtn");
 const zoomResetBtn = document.getElementById("zoomResetBtn");
 const zoomLevelText = document.getElementById("zoomLevel");
 
+const watermarkModal = document.getElementById("watermarkModal");
+const watermarkInput = document.getElementById("watermarkInput");
+const btnApplyWatermark = document.getElementById("applyWatermarkBtn");
+const btnCancelWatermark = document.getElementById("cancelWatermarkBtn");
+
 let currentZoom = 1; // 1 = 100%
 let baseHeight = 0; // Chiều cao gốc (khi màn hình chưa zoom)
 let isDragging = false;
 let startX, startY, scrollLeft, scrollTop;
+let currentWatermark = ""; // Biến lưu trữ chữ Watermark tạm thời
 
 // Reset zoom when opening modal
 function resetZoom() {
@@ -593,6 +600,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnExport = document.getElementById("exportBtn");
     const btnInsertPdf = document.getElementById("insertPdfBtn");
     const insertFileInput = document.getElementById("insertFileInput");
+    const btnInsertBlank = document.getElementById("insertBlankBtn");
+    const btnWatermark = document.getElementById("watermarkBtn");
 
     if (btnInsertPdf) {
         btnInsertPdf.addEventListener("click", () => {
@@ -611,6 +620,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnInsertBlank) {
         btnInsertBlank.addEventListener("click", handleInsertBlank);
+    }
+
+    if (btnWatermark) {
+        btnWatermark.addEventListener("click", () => {
+            watermarkInput.value = currentWatermark;
+            watermarkModal.style.display = "flex";
+            watermarkInput.focus();
+        });
+    }
+
+    if (btnApplyWatermark) {
+        btnApplyWatermark.addEventListener("click", () => {
+            currentWatermark = watermarkInput.value.trim();
+            watermarkModal.style.display = "none";
+            if (currentWatermark) {
+                showToast(`Đã thiết lập Watermark: ${currentWatermark}`, "success");
+                btnWatermark.style.color = "blue"; // Đánh dấu màu xanh nếu đang bật watermark
+            } else {
+                btnWatermark.style.color = "";
+            }
+        });
+    }
+
+    if (btnCancelWatermark) {
+        btnCancelWatermark.addEventListener("click", () => {
+            watermarkModal.style.display = "none";
+        });
     }
 
     if (btnSelectAll) btnSelectAll.addEventListener("click", () => {
@@ -695,10 +731,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 body: JSON.stringify({
                     session_id: sessionId,
-                    operations: currentState
-                })  // ✅ FIX: đóng JSON.stringify()
-            });  // ✅ FIX: đóng fetch options object và fetch()
-
+                    operations: currentState,
+                    watermark: currentWatermark // Gửi chuỗi Watermark vào Backend
+                })
+            });
+            
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.detail || t("toast_error"));

@@ -647,6 +647,17 @@ h3 {
     z-index: 10001;
 }
 
+.dialog-content {
+    background-color: white;
+    margin: auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
 .preview-container {
     flex: 1;
     overflow: auto; /* Hiển thị thanh cuộn nếu ảnh vượt quá container */

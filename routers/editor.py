@@ -20,6 +20,7 @@ UPLOADS_DIR.mkdir(exist_ok=True)
 class OperationRequest(BaseModel):
     session_id: str
     operations: List[Dict[str, Any]]
+    watermark: str = "" # Thêm trường watermark
 
 def remove_file(path: str):
     """Xóa file sau khi gửi"""
@@ -162,7 +163,11 @@ async def editor_apply_endpoint(
         - File: PDF kết quả
     """
     try:
-        result = await apply_operations(req.session_id, req.operations)
+        result = await apply_operations(
+            req.session_id, 
+            req.operations, 
+            req.watermark
+        )
         
         if not result["success"]:
             raise HTTPException(status_code=400, detail=result.get("error", "Lỗi apply operations"))

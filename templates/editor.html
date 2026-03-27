@@ -56,6 +56,8 @@
                     
                     <button id="insertBlankBtn" class="btn btn-small" data-i18n="btn_insert_blank">📄 Chèn trang trắng</button>
                     
+                    <button id="watermarkBtn" class="btn btn-small" data-i18n="btn_watermark">🔤 Chèn Watermark</button>
+                    
                     <button id="bulkDeleteBtn" class="btn btn-small btn-danger" data-i18n="bulk_delete">Xoá các trang đã chọn</button>
                 </div>
                 
@@ -91,6 +93,18 @@
         <!-- Image Container -->
         <div id="previewContainer" class="preview-container">
             <img class="modal-content" id="previewImage">
+        </div>
+    </div>
+
+    <!-- Watermark Modal -->
+    <div id="watermarkModal" class="modal" style="justify-content: center; align-items: center;">
+        <div class="dialog-content">
+            <h3 data-i18n="watermark_prompt">Nhập chữ Watermark</h3>
+            <input type="text" id="watermarkInput" class="form-control" data-i18n-placeholder="watermark_placeholder" placeholder="VD: BẢN NHÁP..." style="width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px;">
+            <div class="button-group" style="justify-content: center; margin-top: 10px;">
+                <button id="applyWatermarkBtn" class="btn btn-primary" style="min-width: 100px;">OK</button>
+                <button id="cancelWatermarkBtn" class="btn btn-secondary" style="min-width: 100px;">Hủy</button>
+            </div>
         </div>
     </div>
 

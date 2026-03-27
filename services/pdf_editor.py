@@ -11,8 +11,49 @@ from pypdf import PdfReader, PdfWriter
 import pypdfium2 as pdfium
 from PIL import Image
 
+# Import ReportLab để tạo Watermark
+from reportlab.pdfgen import canvas
+from reportlab.lib.colors import Color
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
 # Session storage cho PDF-temp files
 SESSIONS = {}
+
+def create_watermark(text: str, width: float, height: float):
+    """
+    Tạo một trang PDF ảo trong suốt chứa chữ Watermark nằm giữa trang
+    """
+    packet = io.BytesIO()
+    # Kích thước trang tuỳ thuộc vào trang đang ghép
+    c = canvas.Canvas(packet, pagesize=(width, height))
+    c.saveState()
+    
+    # Màu xám, độ mờ (alpha) 30%
+    c.setFillColor(Color(0.5, 0.5, 0.5, alpha=0.3))
+    
+    # Cố gắng tải font hệ thống Windows nếu có để hỗ trợ Tiếng Việt (Arial)
+    font_name = "Helvetica-Bold"
+    try:
+        if os.path.exists("C:\\Windows\\Fonts\\arial.ttf"):
+            pdfmetrics.registerFont(TTFont('Arial', 'C:\\Windows\\Fonts\\arial.ttf'))
+            font_name = "Arial"
+    except:
+        pass
+        
+    c.setFont(font_name, min(width, height) / 10) # Cỡ chữ tự scale theo độ to trang
+    
+    # Di chuyển toạ độ vẽ vào trung tâm trang và xoay nghiêng 45 độ
+    c.translate(width / 2, height / 2)
+    c.rotate(45)
+    c.drawCentredString(0, 0, text)
+    
+    c.restoreState()
+    c.save()
+    
+    packet.seek(0)
+    # Trả về đối tượng page của PDF mờ vừa tạo
+    return PdfReader(packet).pages[0]
 
 async def auto_cleanup(session_id: str, delay_seconds: int = 1800):
     """
@@ -282,7 +323,7 @@ async def insert_blank_page(session_id: str) -> dict:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-async def apply_operations(session_id: str, operations: list) -> dict:
+async def apply_operations(session_id: str, operations: list, watermark_text: str = "") -> dict:
     """
     Áp dụng các thao tác chỉnh sửa lên PDF dựa trên state cuối cùng
     
@@ -317,6 +358,16 @@ async def apply_operations(session_id: str, operations: list) -> dict:
                 
                 if rotation != 0:
                     new_page.rotate(rotation)
+                    
+                # Gắn Watermark nếu có
+                if watermark_text:
+                    try:
+                        w = float(new_page.mediabox.width)
+                        h = float(new_page.mediabox.height)
+                        wm_page = create_watermark(watermark_text, w, h)
+                        new_page.merge_page(wm_page)
+                    except Exception as e:
+                        print("Lỗi chèn watermark:", e)
                     
                 writer.add_page(new_page)
         
