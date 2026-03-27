@@ -8,6 +8,7 @@ const TRANSLATIONS = {
     nav_app_title:       "PDF Tools",
     nav_split_merge:     "Tách / Nối PDF",
     nav_editor:          "Chỉnh sửa PDF",
+    nav_compress:        "Nén PDF",
     lang_switch_btn:     "🇯🇵 日本語",
 
     // Trang Split/Merge
@@ -51,6 +52,7 @@ const TRANSLATIONS = {
     // Toast
     toast_upload_ok:     "Upload thành công!",
     toast_process_ok:    "Xử lý hoàn tất!",
+    toast_compress_ok:   "Nén thành công!",
     toast_error:         "Có lỗi xảy ra. Vui lòng thử lại.",
     toast_file_large:    "File quá lớn (tối đa 50MB)",
     toast_no_file:       "Vui lòng chọn file PDF",
@@ -58,6 +60,12 @@ const TRANSLATIONS = {
 
     // Footer
     footer_text:         "Hệ thống nội bộ — Chỉ dành cho nhân viên công ty",
+
+    // Compress
+    compress_title:      "Nén dung lượng PDF",
+    compress_desc:       "Giảm dung lượng file PDF tối đa mà vẫn giữ chất lượng tốt",
+    upload_compress_hint:"Kéo thả file PDF vào đây hoặc click để chọn",
+    btn_compress:        "NÉN PDF",
   },
 
   ja: {
@@ -65,6 +73,7 @@ const TRANSLATIONS = {
     nav_app_title:       "PDF ツール",
     nav_split_merge:     "分割 / 結合",
     nav_editor:          "PDF 編集",
+    nav_compress:        "PDF 圧縮",
     lang_switch_btn:     "🇻🇳 Tiếng Việt",
 
     // Split/Merge
@@ -108,6 +117,7 @@ const TRANSLATIONS = {
     // Toast
     toast_upload_ok:     "アップロード完了！",
     toast_process_ok:    "処理が完了しました！",
+    toast_compress_ok:   "圧縮完了！",
     toast_error:         "エラーが発生しました。もう一度お試しください。",
     toast_file_large:    "ファイルが大きすぎます（最大50MB）",
     toast_no_file:       "PDFファイルを選択してください",
@@ -115,6 +125,12 @@ const TRANSLATIONS = {
 
     // Footer
     footer_text:         "社内システム — 社員専用",
+
+    // Compress
+    compress_title:      "PDFを圧縮",
+    compress_desc:       "品質を保ちながらPDFのファイルサイズを縮小します",
+    upload_compress_hint:"PDFファイルをここにドラッグするか、クリックして選択",
+    btn_compress:        "PDFを圧縮",
   }
 };
 

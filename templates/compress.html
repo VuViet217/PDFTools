@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="nav_compress">Nén PDF</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=1.2">
+    <script src="/static/js/i18n.js?v=1.3"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span data-i18n="nav_app_title">PDF Tools</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/split-merge" class="nav-link" data-i18n="nav_split_merge">Tách / Nối PDF</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/editor" class="nav-link" data-i18n="nav_editor">Chỉnh sửa PDF</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/compress" class="nav-link active" data-i18n="nav_compress" style="color: var(--primary-color);">Nén PDF</a>
+                </li>
+            </ul>
+            
+            <!-- Language Toggle Button -->
+            <button class="lang-toggle" onclick="toggleLang()" data-i18n="lang_switch_btn">🇯🇵 日本語</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h1 data-i18n="compress_title">Nén dung lượng PDF</h1>
+            <p data-i18n="compress_desc" style="color: #666; margin-bottom: 2rem;">Giảm dung lượng file PDF tối đa mà vẫn giữ chất lượng tốt</p>
+            
+            <!-- Upload area -->
+            <div id="compressUploadArea" class="upload-area">
+                <p data-i18n="upload_compress_hint">Kéo thả file PDF vào đây hoặc click để chọn</p>
+                <input type="file" id="compressFileInput" accept=".pdf" style="display:none;">
+            </div>
+            
+            <!-- File info -->
+            <div id="compressFileInfo" class="file-info" style="display:none;">
+                <p>File: <span id="compressFileName"></span></p>
+                <p>Kích thước gốc: <span id="compressOriginalSize"></span></p>
+                <p style="display:none;" id="compressNewSizeWrapper">Kích thước sau nén: <span id="compressNewSize" style="font-weight: bold; color: var(--success-color);"></span></p>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="button-group">
+                <button id="compressBtn" class="btn btn-primary" data-i18n="btn_compress" disabled>NÉN PDF</button>
+            </div>
+            
+            <!-- Result -->
+            <div id="compressResult" style="display:none; text-align: left; margin-top: 1.5rem; background: #e6f7e6; border-left: 4px solid var(--success-color); padding: 1rem; border-radius: 4px;">
+                <a id="compressDownloadBtn" class="btn btn-success" data-i18n="btn_download">Tải xuống</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p data-i18n="footer_text">Hệ thống nội bộ — Chỉ dành cho nhân viên công ty</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add("remove");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+    <script src="/static/js/compress.js?v=1.0"></script>
+</body>
+</html>

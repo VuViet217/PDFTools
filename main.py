@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 # Import routers
 from routers.split_merge import router as split_merge_router
 from routers.editor import router as editor_router
+from routers.compress import router as compress_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,34 +23,28 @@ UPLOADS_DIR = Path("uploads")
 UPLOADS_DIR.mkdir(exist_ok=True)
 
 # Hàm chạy ngầm dọn rác định kỳ (Mỗi giờ dọn 1 lần các file quá cũ)
-async def cleanup_old_files():
-    while True:
-        try:
-            logger.info("🧹 Đang dọn dẹp các file rác cũ trong thư mục uploads...")
-            now = time.time()
-            count = 0
-            for filename in os.listdir(UPLOADS_DIR):
-                file_path = os.path.join(UPLOADS_DIR, filename)
-                # Nếu file là file rác (temp) và đã tồn tại quá 1 giờ (3600 giây)
-                if os.path.isfile(file_path):
-                    if os.stat(file_path).st_mtime < now - 3600:
-                        os.remove(file_path)
-                        count += 1
-            if count > 0:
-                logger.info(f"✨ Đã dọn dẹp {count} file cũ!")
-        except Exception as e:
-            logger.error(f"Lỗi dọn rác: {e}")
-        # Chạy lại sau mỗi 30 phút
-        await asyncio.sleep(1800)
+def cleanup_old_files():
+    try:
+        now = time.time()
+        count = 0
+        for filename in os.listdir(UPLOADS_DIR):
+            file_path = os.path.join(UPLOADS_DIR, filename)
+            # Nếu file là file rác (temp) và đã tồn tại quá 1 giờ (3600 giây)
+            if os.path.isfile(file_path):
+                if os.stat(file_path).st_mtime < now - 3600:
+                    os.remove(file_path)
+                    count += 1
+        if count > 0:
+            logger.info(f"✨ Đã tự động dọn dẹp {count} file rác cũ!")
+    except Exception as e:
+        pass
 
 # Lifespan context
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("✅ PDF Tools App started")
-    # Khởi động tính năng dọn dẹp file tự động
-    task = asyncio.create_task(cleanup_old_files())
+    cleanup_old_files() # Dọn rác một lần lúc khởi động server
     yield
-    task.cancel()
     logger.info("🛑 PDF Tools App shutdown")
 
 # Initialize FastAPI app
@@ -67,6 +62,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Original-Size", "X-New-Size"] # Mở headers để JS đọc % nén
 )
 
 # Mount static files
@@ -76,6 +72,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 # Include routers
 app.include_router(split_merge_router, prefix="/api", tags=["split_merge"])
 app.include_router(editor_router, prefix="/api", tags=["editor"])
+app.include_router(compress_router, prefix="/api", tags=["compress"])
 
 # Root route - serve index.html
 @app.get("/", response_class=HTMLResponse)
@@ -93,6 +90,12 @@ async def split_merge_page():
 @app.get("/editor", response_class=HTMLResponse)
 async def editor_page():
     with open("templates/editor.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# Compress page
+@app.get("/compress", response_class=HTMLResponse)
+async def compress_page():
+    with open("templates/compress.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Health check
