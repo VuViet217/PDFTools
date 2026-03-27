@@ -6,6 +6,8 @@ const TRANSLATIONS = {
   vi: {
     // Navbar
     nav_app_title:       "PDF Tools",
+    nav_pdf_tools:       "PDF Tools",
+    nav_image_converter: "Chuyển đổi ảnh",
     nav_split_merge:     "Tách / Nối PDF",
     nav_editor:          "Chỉnh sửa PDF",
     nav_compress:        "Nén PDF",
@@ -89,6 +91,24 @@ const TRANSLATIONS = {
     tool_image_desc:     "Chuyển đổi, nén, thay đổi kích thước ảnh",
     btn_use_now:         "Sử dụng",
     coming_soon:         "Sắp ra mắt",
+
+    // Image Converter
+    image_converter_title: "Chuyển đổi ảnh",
+    image_converter_desc: "Chuyển đổi giữa các định dạng ảnh, giữ nguyên chất lượng, hỗ trợ 14+ định dạng",
+    image_upload_text: "Kéo thả ảnh vào đây",
+    image_upload_hint: "hoặc click để chọn file",
+    image_file_name: "Tên file:",
+    image_file_size: "Dung lượng:",
+    image_file_format: "Định dạng:",
+    image_raster_formats: "Định dạng Raster",
+    image_raw_formats: "Định dạng Raw",
+    image_quality_label: "Chất lượng:",
+    image_convert_btn: "🔄 Chuyển đổi",
+    image_reset_btn: "↻ Reset",
+    image_convert_success: "✅ Chuyển đổi thành công!",
+    image_download_btn: "⬇ Tải xuống",
+    image_select_format: "Vui lòng chọn định dạng",
+    toast_invalid_image: "Định dạng ảnh không được hỗ trợ",
   },
 
   ja: {
@@ -167,7 +187,7 @@ const TRANSLATIONS = {
     password_unlock_hint: "ファイルを開くためのパスワードを入力",
     btn_protect:         "🔒 ロック",
     btn_unlock:          "🔓 解除",
-    
+
     // Tools Dashboard
     company_tools:       "ツール",
     company_tools_subtitle: "従業員向けの内部データ処理ツール",
@@ -177,6 +197,26 @@ const TRANSLATIONS = {
     tool_image_desc:     "画像を変換、圧縮、リサイズする",
     btn_use_now:         "使用",
     coming_soon:         "近日公開",
+
+    // Image Converter
+    nav_pdf_tools:       "PDF ツール",
+    nav_image_converter: "画像変換",
+    image_converter_title: "画像変換",
+    image_converter_desc: "複数の形式で画像を相互変換し、品質を保持します。14以上の形式をサポート",
+    image_upload_text: "ここに画像をドラッグ",
+    image_upload_hint: "またはクリックして選択",
+    image_file_name: "ファイル名:",
+    image_file_size: "ファイルサイズ:",
+    image_file_format: "形式:",
+    image_raster_formats: "ラスタ形式",
+    image_raw_formats: "RAW形式",
+    image_quality_label: "品質:",
+    image_convert_btn: "🔄 変換",
+    image_reset_btn: "↻ リセット",
+    image_convert_success: "✅ 変換に成功しました!",
+    image_download_btn: "⬇ ダウンロード",
+    image_select_format: "形式を選択してください",
+    toast_invalid_image: "サポートされていない画像形式です",
   }
 };
 

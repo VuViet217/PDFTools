@@ -14,6 +14,7 @@ from routers.split_merge import router as split_merge_router
 from routers.editor import router as editor_router
 from routers.compress import router as compress_router
 from routers.security import router as security_router
+from routers.image_converter import router as image_converter_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -78,6 +79,7 @@ app.include_router(split_merge_router, prefix="/api", tags=["split_merge"])
 app.include_router(editor_router, prefix="/api", tags=["editor"])
 app.include_router(compress_router, prefix="/api", tags=["compress"])
 app.include_router(security_router, prefix="/api", tags=["security"])
+app.include_router(image_converter_router, prefix="/api", tags=["image_converter"])
 
 # Root route - serve tools.html (main dashboard)
 @app.get("/", response_class=HTMLResponse)
@@ -113,6 +115,12 @@ async def compress_page():
 @app.get("/security", response_class=HTMLResponse)
 async def security_page():
     with open("templates/security.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# Image Converter page
+@app.get("/image-converter", response_class=HTMLResponse)
+async def image_converter_page():
+    with open("templates/image_converter.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Manual cleanup endpoint - người dùng có thể gọi khi kết thúc session

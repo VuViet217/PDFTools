@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="nav_image_converter">Chuyển đổi ảnh</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/i18n.js"></script>
+    <style>
+        .image-converter-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .converter-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .converter-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 10px;
+        }
+
+        .converter-desc {
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 25px;
+        }
+
+        .upload-area {
+            border: 2px dashed #dadce0;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .upload-area:hover {
+            border-color: #1a73e8;
+            background: #e8f0fe;
+        }
+
+        .upload-area.active {
+            border-color: #1a73e8;
+            background: #e8f0fe;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: #202124;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #5f6368;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .format-btn {
+            padding: 12px;
+            border: 2px solid #dadce0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .format-btn:hover {
+            border-color: #1a73e8;
+            color: #1a73e8;
+        }
+
+        .format-btn.selected {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+
+        .quality-control {
+            margin-bottom: 25px;
+        }
+
+        .quality-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .quality-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #dadce0;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #1a73e8;
+            cursor: pointer;
+        }
+
+        .quality-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #1a73e8;
+            cursor: pointer;
+            border: none;
+        }
+
+        .file-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #5f6368;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #202124;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1765cc;
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #dadce0;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #1a73e8;
+            border: 1px solid #dadce0;
+        }
+
+        .btn-secondary:hover {
+            background: #e8f0fe;
+        }
+
+        .result-section {
+            background: #e8f0fe;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-success {
+            background: #e6f4ea;
+            border-left: 4px solid #34a853;
+        }
+
+        .result-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #137333;
+            margin-bottom: 15px;
+        }
+
+        .result-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .result-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .result-item-label {
+            font-size: 12px;
+            color: #5f6368;
+            margin-bottom: 5px;
+        }
+
+        .result-item-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #202124;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #34a853;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: #2d8659;
+        }
+
+        .format-categories {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f6368;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            padding-top: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .converter-card {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 25px;
+            }
+
+            .format-grid {
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .result-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span>← OVNC</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/pdf" class="nav-link" data-i18n="nav_pdf_tools">PDF Tools</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/image-converter" class="nav-link" data-i18n="nav_image_converter">Chuyển đổi ảnh</a>
+                </li>
+            </ul>
+            
+            <!-- Language Toggle Button -->
+            <button class="lang-toggle" onclick="toggleLang()" data-i18n="lang_switch_btn">🇯🇵 日本語</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="image-converter-container">
+            <!-- Header -->
+            <div class="converter-card">
+                <h1 class="converter-title" data-i18n="image_converter_title">Chuyển đổi ảnh</h1>
+                <p class="converter-desc" data-i18n="image_converter_desc">Chuyển đổi giữa các định dạng ảnh, giữ nguyên chất lượng, hỗ trợ 14+ định dạng</p>
+
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text" data-i18n="image_upload_text">Kéo thả ảnh vào đây</div>
+                    <div class="upload-hint" data-i18n="image_upload_hint">hoặc click để chọn file</div>
+                    <input type="file" id="imageInput" class="file-input" accept="image/*,.orf,.cr2,.nef,.arw,.dng,.raw">
+                </div>
+
+                <!-- File Info -->
+                <div class="file-info" id="fileInfo">
+                    <div class="info-row">
+                        <span class="info-label" data-i18n="image_file_name">Tên file:</span>
+                        <span class="info-value" id="infoFileName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" data-i18n="image_file_size">Dung lượng:</span>
+                        <span class="info-value" id="infoFileSize">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" data-i18n="image_file_format">Định dạng:</span>
+                        <span class="info-value" id="infoFileFormat">-</span>
+                    </div>
+                </div>
+
+                <!-- Format Selection -->
+                <div style="margin-top: 25px;">
+                    <div class="category-title" data-i18n="image_raster_formats">Định dạng Raster</div>
+                    <div class="format-grid" id="rasterFormats">
+                        <!-- Format buttons will be inserted here -->
+                    </div>
+
+                    <div class="category-title" data-i18n="image_raw_formats">Định dạng Raw</div>
+                    <div class="format-grid" id="rawFormats">
+                        <!-- Raw format buttons will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Quality Control -->
+                <div class="quality-control" id="qualityControl" style="display: none;">
+                    <div class="quality-label">
+                        <span data-i18n="image_quality_label">Chất lượng:</span>
+                        <span id="qualityValue">95%</span>
+                    </div>
+                    <input type="range" id="qualitySlider" class="quality-slider" min="1" max="100" value="95">
+                </div>
+
+                <!-- Loading Indicator -->
+                <div class="loading" id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <p data-i18n="processing">Đang xử lý...</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-group" id="actionButtons" style="display: none;">
+                    <button class="btn btn-primary" id="convertBtn" data-i18n="image_convert_btn">🔄 Chuyển đổi</button>
+                    <button class="btn btn-secondary" id="resetBtn" data-i18n="image_reset_btn">↻ Reset</button>
+                </div>
+
+                <!-- Result Section -->
+                <div class="result-section result-success" id="resultSection" style="display: none;">
+                    <div class="result-title" data-i18n="image_convert_success">✅ Chuyển đổi thành công!</div>
+                    <div class="result-info" id="resultInfo"></div>
+                    <a href="#" id="downloadLink" class="download-btn" data-i18n="image_download_btn">⬇ Tải xuống</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p data-i18n="footer_text">Hệ thống nội bộ — Chỉ dành cho nhân viên công ty</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add("remove");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Tự động dọn dẹp file tạm khi người dùng đóng tab
+        window.addEventListener("beforeunload", function() {
+            navigator.sendBeacon("/api/cleanup");
+        });
+    </script>
+    <script src="/static/js/image_converter.js"></script>
+</body>
+</html>
