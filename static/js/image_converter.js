@@ -397,26 +397,109 @@ function displayBatchResults(results) {
     
     resultInfo.innerHTML = html;
     
+    // Main download section with all/individual options
+    const mainDownloadSection = document.createElement('div');
+    mainDownloadSection.style.marginTop = '15px';
+    mainDownloadSection.style.paddingBottom = '15px';
+    mainDownloadSection.style.borderBottom = '1px solid #e0e0e0';
+    
+    const successFiles = results.filter(r => r.success);
+    
+    // Download all button
+    if (successFiles.length > 1) {
+        const downloadAllBtn = document.createElement('button');
+        downloadAllBtn.type = 'button';
+        downloadAllBtn.className = 'download-btn';
+        downloadAllBtn.style.display = 'inline-block';
+        downloadAllBtn.style.marginBottom = '10px';
+        downloadAllBtn.style.fontSize = '13px';
+        downloadAllBtn.style.padding = '10px 20px';
+        downloadAllBtn.style.fontWeight = '600';
+        downloadAllBtn.style.borderRadius = '6px';
+        downloadAllBtn.style.border = 'none';
+        downloadAllBtn.style.cursor = 'pointer';
+        downloadAllBtn.style.background = 'linear-gradient(135deg, #34a853 0%, #2d8659 100%)';
+        downloadAllBtn.style.color = 'white';
+        downloadAllBtn.style.boxShadow = '0 2px 8px rgba(52, 168, 83, 0.3)';
+        downloadAllBtn.textContent = `📦 Tải xuống tất cả (${successFiles.length} hình)`;
+        
+        downloadAllBtn.onclick = (e) => {
+            e.preventDefault();
+            downloadAllImages(successFiles);
+        };
+        
+        downloadAllBtn.onmouseover = () => {
+            downloadAllBtn.style.background = 'linear-gradient(135deg, #2d8659 0%, #1e5233 100%)';
+            downloadAllBtn.style.boxShadow = '0 4px 12px rgba(52, 168, 83, 0.4)';
+        };
+        downloadAllBtn.onmouseout = () => {
+            downloadAllBtn.style.background = 'linear-gradient(135deg, #34a853 0%, #2d8659 100%)';
+            downloadAllBtn.style.boxShadow = '0 2px 8px rgba(52, 168, 83, 0.3)';
+        };
+        
+        mainDownloadSection.appendChild(downloadAllBtn);
+    }
+    
+    // Individual downloads section
     const downloadSection = document.createElement('div');
     downloadSection.style.marginTop = '15px';
-    downloadSection.innerHTML = '<div style="font-size: 12px; font-weight: 600; color: #5f6368; margin-bottom: 10px;">Tải xuống:</div>';
+    downloadSection.innerHTML = '<div style="font-size: 12px; font-weight: 600; color: #5f6368; margin-bottom: 10px;">Tải riêng:</div>';
     
     const downloadList = document.createElement('div');
     downloadList.style.display = 'flex';
     downloadList.style.flexWrap = 'wrap';
     downloadList.style.gap = '8px';
     
-    results.forEach(result => {
-        if (result.success) {
-            const link = document.createElement('a');
-            link.href = result.download_url;
-            link.download = result.download_filename;
-            link.className = 'download-btn';
-            link.style.fontSize = '12px';
-            link.style.padding = '8px 16px';
-            link.textContent = `⬇ ${result.download_filename}`;
-            downloadList.appendChild(link);
-        }
+    successFiles.forEach(result => {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.className = 'download-btn';
+        link.style.fontSize = '12px';
+        link.style.padding = '8px 16px';
+        link.style.textDecoration = 'none';
+        link.style.borderRadius = '4px';
+        link.style.background = '#f0f0f0';
+        link.style.color = '#202124';
+        link.style.transition = 'all 0.2s';
+        link.style.display = 'inline-block';
+        link.textContent = `⬇ ${result.download_filename}`;
+        
+        link.onclick = (e) => {
+            e.preventDefault();
+            console.log('📥 Downloading:', result.download_filename);
+            
+            fetch(result.download_url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Download failed');
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = result.download_filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    console.log('✓ Downloaded:', result.download_filename);
+                })
+                .catch(error => {
+                    console.error('❌ Download error:', error);
+                    showToast('Lỗi tải xuống: ' + error.message, 'error');
+                });
+        };
+        
+        link.onmouseover = () => {
+            link.style.background = '#e8e8e8';
+            link.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
+        };
+        link.onmouseout = () => {
+            link.style.background = '#f0f0f0';
+            link.style.boxShadow = 'none';
+        };
+        
+        downloadList.appendChild(link);
     });
     
     if (downloadList.children.length > 0) {
@@ -424,11 +507,60 @@ function displayBatchResults(results) {
         resultInfo.parentElement.appendChild(downloadSection);
     }
     
+    if (mainDownloadSection.children.length > 0) {
+        resultInfo.parentElement.appendChild(mainDownloadSection);
+    }
+    
     resultSection.style.display = 'block';
     
     setTimeout(() => {
         resultSection.scrollIntoView({ behavior: 'smooth' });
     }, 100);
+}
+
+// Download all images as ZIP
+async function downloadAllImages(results) {
+    console.log('📦 Downloading all', results.length, 'files as ZIP');
+    
+    try {
+        const filenames = results.map(r => {
+            // Extract filename from download_url (last part)
+            return r.download_filename;
+        });
+        
+        console.log('Files to zip:', filenames);
+        
+        const response = await fetch('/api/image/download-all', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filenames })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'ZIP creation failed');
+        }
+        
+        // Get ZIP file as blob
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `converted_images_${new Date().getTime()}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        console.log('✓ Downloaded ZIP:', a.download);
+        showToast('Đã tải xuống tất cả hình!', 'success');
+        
+    } catch (error) {
+        console.error('❌ Download all error:', error);
+        showToast('Lỗi tải xuống: ' + error.message, 'error');
+    }
 }
 
 console.log('✅ image_converter.js LOADED!');

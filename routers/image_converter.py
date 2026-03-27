@@ -3,7 +3,10 @@ API Router - Image Converter endpoints
 """
 import os
 import time
-from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+import zipfile
+import json
+import threading
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Query
 from fastapi.responses import FileResponse
 from pathlib import Path
 
@@ -76,7 +79,7 @@ async def convert_image_endpoint(
         
         return {
             "success": True,
-            "download_url": f"/uploads/{output_filename}",
+            "download_url": f"/api/image/download/{output_filename}",
             "download_filename": output_filename,
             "metadata": metadata
         }
@@ -89,6 +92,74 @@ async def convert_image_endpoint(
             os.remove(input_path)
         except:
             pass
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/image/download/{filename}")
+async def download_image(filename: str):
+    """Download converted image file"""
+    try:
+        file_path = UPLOADS_DIR / filename
+        
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="File not found")
+        
+        return FileResponse(
+            path=file_path,
+            filename=filename,
+            media_type="application/octet-stream"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/image/download-all")
+async def download_all_images(files: dict):
+    """Download all converted images as ZIP"""
+    try:
+        # Extract filenames from request
+        filenames = files.get('filenames', [])
+        
+        if not filenames:
+            raise HTTPException(status_code=400, detail="No files specified")
+        
+        # Create ZIP file
+        zip_filename = f"converted_images_{int(time.time())}.zip"
+        zip_path = UPLOADS_DIR / zip_filename
+        
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for filename in filenames:
+                file_path = UPLOADS_DIR / filename
+                
+                # Security check: prevent directory traversal
+                if not file_path.exists() or not str(file_path).startswith(str(UPLOADS_DIR)):
+                    continue
+                
+                # Add file to ZIP
+                zipf.write(file_path, arcname=filename)
+        
+        # Remove ZIP after 30 seconds
+        def cleanup():
+            time.sleep(30)
+            try:
+                if zip_path.exists():
+                    os.remove(zip_path)
+            except:
+                pass
+        
+        threading.Thread(target=cleanup, daemon=True).start()
+        
+        return FileResponse(
+            path=zip_path,
+            filename=zip_filename,
+            media_type="application/zip"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
