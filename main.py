@@ -76,9 +76,15 @@ app.include_router(editor_router, prefix="/api", tags=["editor"])
 app.include_router(compress_router, prefix="/api", tags=["compress"])
 app.include_router(security_router, prefix="/api", tags=["security"])
 
-# Root route - serve index.html
+# Root route - serve tools.html (main dashboard)
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
+    with open("templates/tools.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# PDF Tools page
+@app.get("/pdf", response_class=HTMLResponse)
+async def pdf_page():
     with open("templates/index.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 

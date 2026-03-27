@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OVNC Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #fafbfc;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            border-bottom: 1px solid #efefef;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a73e8;
+            letter-spacing: -0.5px;
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 8px;
+        }
+
+        .lang-btn {
+            background: white;
+            border: 1px solid #dadce0;
+            color: #3c4043;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+
+        .lang-btn:hover:not(.active) {
+            border-color: #1a73e8;
+            color: #1a73e8;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            min-height: calc(100vh - 60px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header {
+            margin-bottom: 50px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #666666;
+            font-weight: 400;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 28px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #f0f0f0;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #1a73e8;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: #e8f0fe;
+        }
+
+        .tool-card:hover::before {
+            height: 4px;
+        }
+
+        .tool-card.coming-soon {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .tool-card.coming-soon:hover {
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+        }
+
+        .tool-card.coming-soon::before {
+            background: #d0d0d0;
+        }
+
+        .tool-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .tool-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .tool-description {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .tool-card a {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .tool-card a:hover {
+            background: #1765cc;
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+        }
+
+        .coming-soon-badge {
+            display: inline-block;
+            background: #fff3e0;
+            color: #e65100;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 0 20px;
+                height: 50px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .container {
+                margin-top: 0;
+                padding: 40px 16px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .tools-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+                max-width: 100%;
+            }
+
+            .tool-card {
+                padding: 24px 16px;
+            }
+
+            .tool-icon {
+                font-size: 40px;
+                margin-bottom: 12px;
+            }
+
+            .tool-name {
+                font-size: 16px;
+            }
+
+            .tool-description {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo">OVNC</div>
+        <div class="language-switcher">
+            <button class="lang-btn active" onclick="changeLanguage('vi')">VN</button>
+            <button class="lang-btn" onclick="changeLanguage('ja')">JP</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-i18n="company_tools">Công Cụ</h1>
+            <p data-i18n="company_tools_subtitle">Bộ công cụ xử lý dữ liệu nội bộ dành cho nhân viên</p>
+        </div>
+
+        <div class="tools-grid">
+            <!-- PDF Tools -->
+            <div class="tool-card">
+                <div class="tool-icon">📄</div>
+                <div class="tool-name" data-i18n="tool_pdf">PDF Tools</div>
+                <div class="tool-description" data-i18n="tool_pdf_desc">Tách, nối, chỉnh sửa, nén, bảo mật PDF</div>
+                <a href="/pdf" data-i18n="btn_use_now">Sử dụng</a>
+            </div>
+
+            <!-- Image Converter -->
+            <div class="tool-card coming-soon">
+                <div class="tool-icon">🖼️</div>
+                <div class="tool-name" data-i18n="tool_image">Chuyển đổi ảnh</div>
+                <div class="tool-description" data-i18n="tool_image_desc">Chuyển đổi, nén, thay đổi kích thước ảnh</div>
+                <div class="coming-soon-badge" data-i18n="coming_soon">Sắp ra mắt</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function changeLanguage(lang) {
+            localStorage.setItem('language', lang);
+            document.documentElement.lang = lang;
+            updateTranslations(lang);
+            
+            // Update language buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function updateTranslations(lang) {
+            const translations = {
+                vi: {
+                    company_tools: "Công Cụ",
+                    company_tools_subtitle: "Bộ công cụ xử lý dữ liệu nội bộ dành cho nhân viên",
+                    tool_pdf: "PDF Tools",
+                    tool_pdf_desc: "Tách, nối, chỉnh sửa, nén, bảo mật PDF",
+                    tool_image: "Chuyển đổi ảnh",
+                    tool_image_desc: "Chuyển đổi, nén, thay đổi kích thước ảnh",
+                    btn_use_now: "Sử dụng",
+                    coming_soon: "Sắp ra mắt"
+                },
+                ja: {
+                    company_tools: "ツール",
+                    company_tools_subtitle: "従業員向けの内部データ処理ツール",
+                    tool_pdf: "PDF ツール",
+                    tool_pdf_desc: "PDF を分割、結合、編集、圧縮、保護",
+                    tool_image: "画像変換",
+                    tool_image_desc: "画像を変換、圧縮、リサイズする",
+                    btn_use_now: "使用",
+                    coming_soon: "近日公開"
+                }
+            };
+
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+        }
+
+        // Load saved language on page load
+        const savedLang = localStorage.getItem('language') || 'vi';
+        document.documentElement.lang = savedLang;
+        updateTranslations(savedLang);
+        
+        // Update language button state
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            if ((savedLang === 'vi' && btn.textContent.includes('VN')) ||
+                (savedLang === 'ja' && btn.textContent.includes('JP'))) {
+                btn.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

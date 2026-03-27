@@ -79,6 +79,16 @@ const TRANSLATIONS = {
     password_unlock_hint: "Nhập mật khẩu để mở file",
     btn_protect:         "🔒 KHÓA PDF",
     btn_unlock:          "🔓 MỞ KHÓA PDF",
+    
+    // Tools Dashboard
+    company_tools:       "Công Cụ",
+    company_tools_subtitle: "Bộ công cụ xử lý dữ liệu nội bộ dành cho nhân viên",
+    tool_pdf:            "PDF Tools",
+    tool_pdf_desc:       "Tách, nối, chỉnh sửa, nén, bảo mật PDF",
+    tool_image:          "Chuyển đổi ảnh",
+    tool_image_desc:     "Chuyển đổi, nén, thay đổi kích thước ảnh",
+    btn_use_now:         "Sử dụng",
+    coming_soon:         "Sắp ra mắt",
   },
 
   ja: {
@@ -157,6 +167,16 @@ const TRANSLATIONS = {
     password_unlock_hint: "ファイルを開くためのパスワードを入力",
     btn_protect:         "🔒 ロック",
     btn_unlock:          "🔓 解除",
+    
+    // Tools Dashboard
+    company_tools:       "ツール",
+    company_tools_subtitle: "従業員向けの内部データ処理ツール",
+    tool_pdf:            "PDF ツール",
+    tool_pdf_desc:       "PDF を分割、結合、編集、圧縮、保護",
+    tool_image:          "画像変換",
+    tool_image_desc:     "画像を変換、圧縮、リサイズする",
+    btn_use_now:         "使用",
+    coming_soon:         "近日公開",
   }
 };
 
