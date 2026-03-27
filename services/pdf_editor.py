@@ -224,6 +224,64 @@ async def insert_pdf_editor(session_id: str, file_path: str) -> dict:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+async def insert_blank_page(session_id: str) -> dict:
+    """
+    Chèn thêm một trang trắng vào cuối file đang chỉnh sửa
+    """
+    try:
+        if session_id not in SESSIONS:
+            return {"success": False, "error": "Session không tồn tại"}
+            
+        session = SESSIONS[session_id]
+        
+        # Đọc dữ liệu pdf hiện tại
+        old_pdf_data = session["pdf_data"]
+        reader = PdfReader(io.BytesIO(old_pdf_data))
+        writer = PdfWriter()
+        
+        # Mặc định kích thước là A4
+        width, height = 595.28, 841.89
+        
+        # Giữ lại các trang cũ, và lấy kích thước trang cuối cùng để làm trang trắng
+        for page in reader.pages:
+            writer.add_page(page)
+            try:
+                width = float(page.mediabox.width)
+                height = float(page.mediabox.height)
+            except:
+                pass                
+                
+        # Thêm 1 trang trắng ở cuối với kích thước tương tự
+        writer.add_blank_page(width=width, height=height)
+        
+        # Cập nhật pdf_data
+        output_buffer = io.BytesIO()
+        writer.write(output_buffer)
+        output_buffer.seek(0)
+        
+        session["pdf_data"] = output_buffer.getvalue()
+        
+        # Thêm 1 trang vào tổng
+        page_idx = session["total_pages"]
+        session["total_pages"] += 1
+        
+        # Khởi tạo thumbnail placeholder cho trang trắng (trang trống thì không cần render)
+        svg_data = f'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="200"%3E%3Crect fill="%23fdfdfd" width="150" height="200"/%3E%3Ctext x="50%" y="50%" font-size="14" text-anchor="middle" dominant-baseline="middle" fill="%23ccc"%3ETrang Trắng%3C/text%3E%3C/svg%3E'
+        thumb_obj = {
+            "thumb": svg_data,
+            "preview": svg_data
+        }
+        
+        session["thumbnails"].append(thumb_obj)
+        
+        return {
+            "success": True,
+            "new_thumbnails": [thumb_obj],
+            "total_pages": session["total_pages"]
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 async def apply_operations(session_id: str, operations: list) -> dict:
     """
     Áp dụng các thao tác chỉnh sửa lên PDF dựa trên state cuối cùng

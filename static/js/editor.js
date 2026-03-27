@@ -24,6 +24,7 @@ const bulkDeleteBtn = document.getElementById("bulkDeleteBtn");
 const exportBtn = document.getElementById("exportBtn");
 const insertPdfBtn = document.getElementById("insertPdfBtn");
 const insertFileInput = document.getElementById("insertFileInput");
+const btnInsertBlank = document.getElementById("insertBlankBtn");
 
 // Preview Modal Setup
 const previewModal = document.getElementById("previewModal");
@@ -332,6 +333,48 @@ async function handleInsertPdf(file) {
     }
 }
 
+async function handleInsertBlank() {
+    if (!sessionId) return;
+
+    showToast(t("processing") || "Đang xử lý...", "info");
+    
+    try {
+        const formData = new FormData();
+        formData.append("session_id", sessionId); 
+        
+        const response = await fetch("/api/editor/insert-blank", {
+            method: "POST",
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || t("toast_error"));
+        }
+        
+        const result = await response.json();
+        
+        // Cập nhật State nội bộ
+        const oldTotal = totalPages;
+        totalPages = result.total_pages; // Tổng số trang mới
+        
+        // Thêm hình thu nhỏ mới nối tiếp vào cuối danh sách
+        thumbnails = thumbnails.concat(result.new_thumbnails);
+        
+        // Thêm các số trang mới vào pageOrder để hiển thị
+        for (let i = oldTotal + 1; i <= totalPages; i++) {
+            pageOrder.push(i);
+        }
+        
+        showToast(t("toast_process_ok") || "Chèn trang trắng thành công", "success");
+        
+        // Vẽ lại grid hiển thị toàn bộ trang
+        renderThumbnails();
+    } catch (err) {
+        showToast(err.message || t("toast_error"), "error");
+    }
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // THUMBNAIL RENDERING
 // ════════════════════════════════════════════════════════════════════════════
@@ -549,6 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDeleteBlank = document.getElementById("deleteBlankBtn");
     const btnExport = document.getElementById("exportBtn");
     const btnInsertPdf = document.getElementById("insertPdfBtn");
+    const insertFileInput = document.getElementById("insertFileInput");
 
     if (btnInsertPdf) {
         btnInsertPdf.addEventListener("click", () => {
@@ -563,6 +607,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 e.target.value = ''; // Reset
             }
         });
+    }
+
+    if (btnInsertBlank) {
+        btnInsertBlank.addEventListener("click", handleInsertBlank);
     }
 
     if (btnSelectAll) btnSelectAll.addEventListener("click", () => {

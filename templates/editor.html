@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="nav_editor">Chỉnh sửa PDF</title>
     <link rel="stylesheet" href="/static/css/style.css?v=1.1">
-    <script src="/static/js/i18n.js?v=1.1"></script>
+    <script src="/static/js/i18n.js?v=1.2"></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -53,6 +53,8 @@
                     <!-- Nút chèn file PDF mới (đứng trước nút Xóa) -->
                     <button id="insertPdfBtn" class="btn btn-small" data-i18n="btn_insert_pdf">➕ Chèn PDF</button>
                     <input type="file" id="insertFileInput" accept=".pdf" style="display:none;">
+                    
+                    <button id="insertBlankBtn" class="btn btn-small" data-i18n="btn_insert_blank">📄 Chèn trang trắng</button>
                     
                     <button id="bulkDeleteBtn" class="btn btn-small btn-danger" data-i18n="bulk_delete">Xoá các trang đã chọn</button>
                 </div>

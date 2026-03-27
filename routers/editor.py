@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from pathlib import Path
 from typing import List, Dict, Any
 
-from services.pdf_editor import upload_pdf_editor, apply_operations, cleanup_session, insert_pdf_editor
+from services.pdf_editor import upload_pdf_editor, apply_operations, cleanup_session, insert_pdf_editor, insert_blank_page
 
 router = APIRouter()
 
@@ -117,6 +117,26 @@ async def editor_insert_endpoint(
     
     except HTTPException:
         raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/editor/insert-blank")
+async def editor_insert_blank_endpoint(
+    session_id: str = Form(...)
+):
+    """
+    Chèn thêm một trang trắng vào session đang chỉnh sửa
+    """
+    try:
+        result = await insert_blank_page(session_id)
+        
+        if not result["success"]:
+            raise HTTPException(status_code=400, detail=result.get("error", "Lỗi chèn trang trắng"))
+        
+        return {
+            "total_pages": result["total_pages"],
+            "new_thumbnails": result["new_thumbnails"]
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
