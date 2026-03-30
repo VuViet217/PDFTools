@@ -16,6 +16,7 @@ from routers.compress import router as compress_router
 from routers.security import router as security_router
 from routers.image_converter import router as image_converter_router
 from routers.word_compare import router as word_compare_router
+from routers.excel_compare import router as excel_compare_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -110,6 +111,7 @@ app.include_router(compress_router, prefix="/api", tags=["compress"])
 app.include_router(security_router, prefix="/api", tags=["security"])
 app.include_router(image_converter_router, prefix="/api", tags=["image_converter"])
 app.include_router(word_compare_router, prefix="/api", tags=["word_compare"])
+app.include_router(excel_compare_router, prefix="/api", tags=["excel_compare"])
 
 # Root route - serve tools.html (main dashboard)
 @app.get("/", response_class=HTMLResponse)
@@ -163,6 +165,12 @@ async def password_generator_page():
 @app.get("/word-compare", response_class=HTMLResponse)
 async def word_compare_page():
     with open("templates/word_compare.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# Excel Compare page
+@app.get("/excel-compare", response_class=HTMLResponse)
+async def excel_compare_page():
+    with open("templates/excel_compare.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Manual cleanup endpoint - người dùng có thể gọi khi kết thúc session

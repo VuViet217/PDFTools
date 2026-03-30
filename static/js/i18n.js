@@ -152,6 +152,20 @@ const TRANSLATIONS = {
     view_unified: "Thống Nhất",
     reset_btn: "↻ Reset",
     processing: "Đang xử lý...",
+
+    // Excel Compare
+    excel_compare_title: "So Sánh Excel",
+    excel_compare_upload1: "Tải lên File 1 (.xlsx)",
+    excel_compare_upload2: "Tải lên File 2 (.xlsx)",
+    excel_compare_hint: "Kéo thả file hoặc click để chọn",
+    excel_compare_btn: "📊 So Sánh",
+    excel_compare_removed: "Dòng bị xóa",
+    excel_compare_added: "Dòng được thêm",
+    excel_compare_modified: "Dòng được sửa",
+    excel_compare_unchanged: "Dòng giữ nguyên",
+    view_summary: "Tóm Tắt",
+    view_detailed: "Chi Tiết",
+    btn_download: "⬇ Tải Excel",
   },
 
   ja: {
@@ -303,6 +317,20 @@ const TRANSLATIONS = {
     view_unified: "統合表示",
     reset_btn: "↻ リセット",
     processing: "処理中...",
+
+    // Excel Compare
+    excel_compare_title: "Excel比較",
+    excel_compare_upload1: "ファイル1をアップロード (.xlsx)",
+    excel_compare_upload2: "ファイル2をアップロード (.xlsx)",
+    excel_compare_hint: "ファイルをドラッグするか、クリックして選択",
+    excel_compare_btn: "📊 比較",
+    excel_compare_removed: "削除されたロー",
+    excel_compare_added: "追加されたロー",
+    excel_compare_modified: "変更されたロー",
+    excel_compare_unchanged: "変更されていないロー",
+    view_summary: "サマリー",
+    view_detailed: "詳細",
+    btn_download: "⬇ Excelをダウンロード",
   }
 };
 
