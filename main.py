@@ -157,6 +157,12 @@ async def password_generator_page():
     with open("templates/password_generator.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
+# Word Compare page
+@app.get("/word-compare", response_class=HTMLResponse)
+async def word_compare_page():
+    with open("templates/word_compare.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
 # Manual cleanup endpoint - người dùng có thể gọi khi kết thúc session
 @app.post("/api/cleanup")
 async def manual_cleanup():

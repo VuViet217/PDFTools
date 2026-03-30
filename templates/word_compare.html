@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="word_compare_title">So Sánh Word</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=1">
+    <script src="/static/js/i18n.js?v=1"></script>
+    <style>
+        .compare-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .upload-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .upload-box {
+            background: white;
+            border: 2px dashed var(--primary-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-box:hover {
+            border-color: #1765cc;
+            background: #f8f9fa;
+        }
+
+        .upload-box.dragover {
+            background: #e8f0fe;
+            border-color: #1765cc;
+        }
+
+        .upload-box input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .file-name {
+            background: #f0f2f5;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            word-break: break-all;
+            display: none;
+        }
+
+        .file-name.show {
+            display: block;
+        }
+
+        .file-name.error {
+            background: #ffe0e0;
+            color: #dc3545;
+        }
+
+        .compare-button {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1765cc;
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .comparison-result {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .comparison-result.show {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .view-mode {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .comparison-view {
+            display: none;
+        }
+
+        .comparison-view.active {
+            display: block;
+        }
+
+        /* Side-by-side view */
+        .side-by-side {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .file-column {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            background: #f8f9fa;
+        }
+
+        .column-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .diff-content {
+            line-height: 1.8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .diff-line {
+            padding: 0.25rem 0.5rem;
+            margin-bottom: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .diff-removed {
+            background: #ffe0e0;
+            color: #721c24;
+        }
+
+        .diff-added {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .diff-unchanged {
+            background: white;
+            color: var(--text-dark);
+        }
+
+        /* Unified view */
+        .unified-content {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+        }
+
+        .legend {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .upload-section {
+                grid-template-columns: 1fr;
+            }
+
+            .side-by-side {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-container {
+                padding: 1rem;
+            }
+
+            .compare-button {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span>← <span data-i18n="word_compare_title">So Sánh Word</span></span>
+            </a>
+            
+            <ul class="nav-menu">
+            </ul>
+            
+            <!-- Language Toggle Button -->
+            <button class="lang-toggle" onclick="toggleLang()" data-i18n="lang_switch_btn">🇯🇵 日本語</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="compare-container">
+            <h1 data-i18n="word_compare_title">So Sánh Word</h1>
+
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <div class="upload-box" id="uploadBox1" onclick="document.getElementById('file1').click();">
+                    <div class="upload-icon">📄</div>
+                    <label class="upload-label" data-i18n="word_compare_upload1">Tải lên File 1 (.docx)</label>
+                    <div class="upload-hint" data-i18n="word_compare_hint">Kéo thả file hoặc click để chọn</div>
+                    <div class="file-name" id="fileName1"></div>
+                    <input type="file" id="file1" accept=".docx" />
+                </div>
+
+                <div class="upload-box" id="uploadBox2" onclick="document.getElementById('file2').click();">
+                    <div class="upload-icon">📄</div>
+                    <label class="upload-label" data-i18n="word_compare_upload2">Tải lên File 2 (.docx)</label>
+                    <div class="upload-hint" data-i18n="word_compare_hint">Kéo thả file hoặc click để chọn</div>
+                    <div class="file-name" id="fileName2"></div>
+                    <input type="file" id="file2" accept=".docx" />
+                </div>
+            </div>
+
+            <!-- Compare Button -->
+            <div class="compare-button">
+                <button class="btn btn-primary" id="compareBtn" data-i18n="word_compare_btn" disabled>📊 So Sánh</button>
+                <button class="btn btn-secondary" id="resetBtn" data-i18n="reset_btn">↻ Reset</button>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div class="loading-text" data-i18n="processing">Đang xử lý...</div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- Comparison Result -->
+            <div class="comparison-result" id="comparisonResult">
+                <div class="result-header">
+                    <div class="result-title" data-i18n="compare_result_title">Kết Quả So Sánh</div>
+                    <div class="view-mode">
+                        <button class="view-btn active" id="viewSideBySide" data-i18n="view_side_by_side">Cột Kép</button>
+                        <button class="view-btn" id="viewUnified" data-i18n="view_unified">Thống Nhất</button>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color diff-removed"></div>
+                        <span data-i18n="word_compare_removed">Nội dung bị xóa</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color diff-added"></div>
+                        <span data-i18n="word_compare_added">Nội dung thêm vào</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color diff-unchanged"></div>
+                        <span data-i18n="word_compare_unchanged">Nội dung giữ nguyên</span>
+                    </div>
+                </div>
+
+                <!-- Side-by-side View -->
+                <div class="comparison-view active" id="sideBySideView">
+                    <div class="side-by-side">
+                        <div class="file-column">
+                            <div class="column-title" id="file1Title">File 1</div>
+                            <div class="diff-content" id="file1Content"></div>
+                        </div>
+                        <div class="file-column">
+                            <div class="column-title" id="file2Title">File 2</div>
+                            <div class="diff-content" id="file2Content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unified View -->
+                <div class="comparison-view" id="unifiedView">
+                    <div class="unified-content" id="unifiedContent"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p data-i18n="footer_text">Hệ thống nội bộ — Chỉ dành cho nhân viên công ty</p>
+    </footer>
+
+    <script>
+        const elements = {
+            file1: document.getElementById('file1'),
+            file2: document.getElementById('file2'),
+            uploadBox1: document.getElementById('uploadBox1'),
+            uploadBox2: document.getElementById('uploadBox2'),
+            fileName1: document.getElementById('fileName1'),
+            fileName2: document.getElementById('fileName2'),
+            compareBtn: document.getElementById('compareBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            loading: document.getElementById('loading'),
+            errorMessage: document.getElementById('errorMessage'),
+            comparisonResult: document.getElementById('comparisonResult'),
+            viewSideBySide: document.getElementById('viewSideBySide'),
+            viewUnified: document.getElementById('viewUnified'),
+            sideBySideView: document.getElementById('sideBySideView'),
+            unifiedView: document.getElementById('unifiedView'),
+            file1Content: document.getElementById('file1Content'),
+            file2Content: document.getElementById('file2Content'),
+            unifiedContent: document.getElementById('unifiedContent'),
+            file1Title: document.getElementById('file1Title'),
+            file2Title: document.getElementById('file2Title')
+        };
+
+        // File upload handling
+        function setupFileUpload(fileInput, fileNameDisplay, uploadBox) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    updateFileDisplay(file, fileNameDisplay);
+                    checkBothFilesSelected();
+                }
+            });
+
+            // Drag and drop
+            uploadBox.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadBox.classList.add('dragover');
+            });
+
+            uploadBox.addEventListener('dragleave', () => {
+                uploadBox.classList.remove('dragover');
+            });
+
+            uploadBox.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadBox.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                        fileInput.files = files;
+                        updateFileDisplay(file, fileNameDisplay);
+                        checkBothFilesSelected();
+                    } else {
+                        showError('Vui lòng chỉ upload file Word (.docx)');
+                    }
+                }
+            });
+        }
+
+        function updateFileDisplay(file, fileNameDisplay) {
+            fileNameDisplay.textContent = file.name;
+            fileNameDisplay.classList.remove('error');
+            fileNameDisplay.classList.add('show');
+        }
+
+        function checkBothFilesSelected() {
+            const file1 = elements.file1.files.length > 0;
+            const file2 = elements.file2.files.length > 0;
+            elements.compareBtn.disabled = !(file1 && file2);
+        }
+
+        // Setup file uploads
+        setupFileUpload(elements.file1, elements.fileName1, elements.uploadBox1);
+        setupFileUpload(elements.file2, elements.fileName2, elements.uploadBox2);
+
+        // Clear error message
+        function clearError() {
+            elements.errorMessage.classList.remove('show');
+            elements.errorMessage.textContent = '';
+        }
+
+        // Show error
+        function showError(message) {
+            elements.errorMessage.textContent = message;
+            elements.errorMessage.classList.add('show');
+        }
+
+        // Reset button
+        elements.resetBtn.addEventListener('click', () => {
+            elements.file1.value = '';
+            elements.file2.value = '';
+            elements.fileName1.classList.remove('show');
+            elements.fileName2.classList.remove('show');
+            elements.comparisonResult.classList.remove('show');
+            elements.loading.classList.remove('show');
+            clearError();
+            elements.compareBtn.disabled = true;
+        });
+
+        // View mode switching
+        elements.viewSideBySide.addEventListener('click', () => {
+            elements.viewSideBySide.classList.add('active');
+            elements.viewUnified.classList.remove('active');
+            elements.sideBySideView.classList.add('active');
+            elements.unifiedView.classList.remove('active');
+        });
+
+        elements.viewUnified.addEventListener('click', () => {
+            elements.viewUnified.classList.add('active');
+            elements.viewSideBySide.classList.remove('active');
+            elements.unifiedView.classList.add('active');
+            elements.sideBySideView.classList.remove('active');
+        });
+
+        // Compare button
+        elements.compareBtn.addEventListener('click', async () => {
+            clearError();
+            elements.loading.classList.add('show');
+
+            try {
+                const formData = new FormData();
+                formData.append('file1', elements.file1.files[0]);
+                formData.append('file2', elements.file2.files[0]);
+
+                const response = await fetch('/api/word-compare', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Lỗi khi so sánh file');
+                }
+
+                const result = await response.json();
+                displayComparison(result);
+            } catch (error) {
+                showError('Lỗi: ' + error.message);
+            } finally {
+                elements.loading.classList.remove('show');
+            }
+        });
+
+        // Display comparison result
+        function displayComparison(data) {
+            // Update file titles
+            elements.file1Title.textContent = elements.file1.files[0].name;
+            elements.file2Title.textContent = elements.file2.files[0].name;
+
+            // Side-by-side view
+            const file1Lines = data.file1.map(line => createDiffElement(line)).join('');
+            const file2Lines = data.file2.map(line => createDiffElement(line)).join('');
+            
+            elements.file1Content.innerHTML = file1Lines || '<p style="color: #999;">Không có nội dung</p>';
+            elements.file2Content.innerHTML = file2Lines || '<p style="color: #999;">Không có nội dung</p>';
+
+            // Unified view
+            const unifiedLines = createUnifiedView(data.unified);
+            elements.unifiedContent.innerHTML = unifiedLines || '<p style="color: #999;">Không có nội dung</p>';
+
+            elements.comparisonResult.classList.add('show');
+        }
+
+        function createDiffElement(line) {
+            if (!line) return '';
+            
+            const type = line.type;
+            const text = line.content;
+            const className = `diff-line diff-${type}`;
+            
+            return `<div class="${className}">${escapeHtml(text)}</div>`;
+        }
+
+        function createUnifiedView(lines) {
+            return lines.map(line => {
+                const type = line.type;
+                const text = line.content;
+                const prefix = type === 'removed' ? '✘ ' : type === 'added' ? '✓ ' : '';
+                const className = `diff-line diff-${type}`;
+                
+                return `<div class="${className}">${prefix}${escapeHtml(text)}</div>`;
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Add translations to i18n
+        document.addEventListener('languageChanged', () => {
+            applyLang();
+        });
+    </script>
+</body>
+</html>

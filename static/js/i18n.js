@@ -137,6 +137,20 @@ const TRANSLATIONS = {
     pwd_error_no_options: "Vui lòng chọn ít nhất một tùy chọn (chữ In Hoa, chữ Thường, Số, hoặc Ký Tự Đặc Biệt)",
     pwd_error_min_length: "Bắt buộc tối thiểu 8 ký tự",
     pwd_error_required_longer: "Từ bắt buộc không được dài hơn số lượng ký tự",
+
+    // Word Compare
+    word_compare_title: "So Sánh Word",
+    word_compare_upload1: "Tải lên File 1 (.docx)",
+    word_compare_upload2: "Tải lên File 2 (.docx)",
+    word_compare_hint: "Kéo thả file hoặc click để chọn",
+    word_compare_btn: "📊 So Sánh",
+    word_compare_removed: "Nội dung bị xóa",
+    word_compare_added: "Nội dung thêm vào",
+    word_compare_unchanged: "Nội dung giữ nguyên",
+    compare_result_title: "Kết Quả So Sánh",
+    view_side_by_side: "Cột Kép",
+    view_unified: "Thống Nhất",
+    reset_btn: "↻ Reset",
   },
 
   ja: {
@@ -273,6 +287,20 @@ const TRANSLATIONS = {
     pwd_error_no_options: "少なくとも1つのオプションを選択してください（大文字、小文字、数字、または特殊文字）",
     pwd_error_min_length: "最小8文字が必須です",
     pwd_error_required_longer: "必須文字数がキャラクタ数より長くすることはできません",
+
+    // Word Compare
+    word_compare_title: "Word比較",
+    word_compare_upload1: "ファイル1をアップロード (.docx)",
+    word_compare_upload2: "ファイル2をアップロード (.docx)",
+    word_compare_hint: "ファイルをドラッグするか、クリックして選択",
+    word_compare_btn: "📊 比較",
+    word_compare_removed: "削除されたコンテンツ",
+    word_compare_added: "追加されたコンテンツ",
+    word_compare_unchanged: "変更されていないコンテンツ",
+    compare_result_title: "比較結果",
+    view_side_by_side: "サイドバイサイド",
+    view_unified: "統合表示",
+    reset_btn: "↻ リセット",
   }
 };
 
