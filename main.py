@@ -15,6 +15,7 @@ from routers.editor import router as editor_router
 from routers.compress import router as compress_router
 from routers.security import router as security_router
 from routers.image_converter import router as image_converter_router
+from routers.word_compare import router as word_compare_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -108,6 +109,7 @@ app.include_router(editor_router, prefix="/api", tags=["editor"])
 app.include_router(compress_router, prefix="/api", tags=["compress"])
 app.include_router(security_router, prefix="/api", tags=["security"])
 app.include_router(image_converter_router, prefix="/api", tags=["image_converter"])
+app.include_router(word_compare_router, prefix="/api", tags=["word_compare"])
 
 # Root route - serve tools.html (main dashboard)
 @app.get("/", response_class=HTMLResponse)

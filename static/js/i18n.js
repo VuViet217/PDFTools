@@ -151,6 +151,7 @@ const TRANSLATIONS = {
     view_side_by_side: "Cột Kép",
     view_unified: "Thống Nhất",
     reset_btn: "↻ Reset",
+    processing: "Đang xử lý...",
   },
 
   ja: {
@@ -301,6 +302,7 @@ const TRANSLATIONS = {
     view_side_by_side: "サイドバイサイド",
     view_unified: "統合表示",
     reset_btn: "↻ リセット",
+    processing: "処理中...",
   }
 };
 

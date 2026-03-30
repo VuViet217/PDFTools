@@ -563,13 +563,19 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Lỗi khi so sánh file');
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Lỗi khi so sánh file');
                 }
 
                 const result = await response.json();
                 displayComparison(result);
             } catch (error) {
-                showError('Lỗi: ' + error.message);
+                const translations = {
+                    vi: 'Lỗi: ',
+                    ja: 'エラー: '
+                };
+                const lang = currentLang || 'vi';
+                showError(translations[lang] + error.message);
             } finally {
                 elements.loading.classList.remove('show');
             }
