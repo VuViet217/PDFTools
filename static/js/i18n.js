@@ -116,6 +116,27 @@ const TRANSLATIONS = {
     image_download_btn: "⬇ Tải xuống",
     image_select_format: "Vui lòng chọn định dạng",
     toast_invalid_image: "Định dạng ảnh không được hỗ trợ",
+
+    // Password Generator
+    pwd_gen_title: "Tạo Mật Khẩu",
+    pwd_length_label: "Số lượng ký tự",
+    pwd_length_hint: "Tối thiểu 8 ký tự, tối đa 64 ký tự",
+    pwd_uppercase: "Chữ In Hoa (A-Z)",
+    pwd_lowercase: "Chữ Thường (a-z)",
+    pwd_numbers: "Số (0-9)",
+    pwd_symbols: "Ký Tự Đặc Biệt (!@#$%)",
+    pwd_required_label: "Từ bắt buộc có trong mật khẩu (tuỳ chọn)",
+    pwd_required_placeholder: "VD: abc123",
+    pwd_required_hint: "Để trống nếu không cần yêu cầu ký tự cụ thể",
+    pwd_generate_btn: "🔐 Tạo Mật Khẩu",
+    pwd_strength_weak: "Yếu",
+    pwd_strength_fair: "Trung Bình",
+    pwd_strength_good: "Tốt",
+    pwd_strength_strong: "Mạnh",
+    pwd_strength_very_strong: "Rất Mạnh",
+    pwd_error_no_options: "Vui lòng chọn ít nhất một tùy chọn (chữ In Hoa, chữ Thường, Số, hoặc Ký Tự Đặc Biệt)",
+    pwd_error_min_length: "Bắt buộc tối thiểu 8 ký tự",
+    pwd_error_required_longer: "Từ bắt buộc không được dài hơn số lượng ký tự",
   },
 
   ja: {
@@ -231,6 +252,27 @@ const TRANSLATIONS = {
     image_download_btn: "⬇ ダウンロード",
     image_select_format: "形式を選択してください",
     toast_invalid_image: "サポートされていない画像形式です",
+
+    // Password Generator
+    pwd_gen_title: "パスワード生成",
+    pwd_length_label: "文字数",
+    pwd_length_hint: "最小8文字、最大64文字",
+    pwd_uppercase: "大文字 (A-Z)",
+    pwd_lowercase: "小文字 (a-z)",
+    pwd_numbers: "数字 (0-9)",
+    pwd_symbols: "特殊文字 (!@#$%)",
+    pwd_required_label: "必須文字を含める（オプション）",
+    pwd_required_placeholder: "例: abc123",
+    pwd_required_hint: "特定の文字が必要ない場合は空白のままにしてください",
+    pwd_generate_btn: "🔐 パスワード生成",
+    pwd_strength_weak: "弱い",
+    pwd_strength_fair: "普通",
+    pwd_strength_good: "良い",
+    pwd_strength_strong: "強い",
+    pwd_strength_very_strong: "非常に強い",
+    pwd_error_no_options: "少なくとも1つのオプションを選択してください（大文字、小文字、数字、または特殊文字）",
+    pwd_error_min_length: "最小8文字が必須です",
+    pwd_error_required_longer: "必須文字数がキャラクタ数より長くすることはできません",
   }
 };
 

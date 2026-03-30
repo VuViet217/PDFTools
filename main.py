@@ -151,6 +151,12 @@ async def image_converter_page():
     with open("templates/image_converter.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
+# Password Generator page
+@app.get("/password-generator", response_class=HTMLResponse)
+async def password_generator_page():
+    with open("templates/password_generator.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
 # Manual cleanup endpoint - người dùng có thể gọi khi kết thúc session
 @app.post("/api/cleanup")
 async def manual_cleanup():
