@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="word_compare_title">So Sánh Word</title>
-    <link rel="stylesheet" href="/static/css/style.css?v=1">
-    <script src="/static/js/i18n.js?v=1"></script>
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+    <script src="/static/js/i18n.js?v=2"></script>
     <style>
         .compare-container {
             max-width: 1200px;
@@ -637,6 +637,23 @@
         document.addEventListener('languageChanged', () => {
             applyLang();
         });
+
+        // Apply language on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    if (typeof applyLang === 'function') {
+                        applyLang();
+                    }
+                }, 100);
+            });
+        } else {
+            setTimeout(() => {
+                if (typeof applyLang === 'function') {
+                    applyLang();
+                }
+            }, 100);
+        }
     </script>
 </body>
 </html>

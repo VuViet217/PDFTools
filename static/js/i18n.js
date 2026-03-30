@@ -356,5 +356,5 @@ if (document.readyState === "loading") {
 // Debug: kiểm tra xem bản dịch có được load đúng không
 console.log("[i18n] Current language:", currentLang);
 console.log("[i18n] Available keys in VI:", Object.keys(TRANSLATIONS.vi));
-console.log("[i18n] ocr_title VI:", TRANSLATIONS.vi.ocr_title);
-console.log("[i18n] ocr_desc VI:", TRANSLATIONS.vi.ocr_desc);
+console.log("[i18n] word_compare_title VI:", TRANSLATIONS.vi.word_compare_title);
+console.log("[i18n] word_compare_upload1 VI:", TRANSLATIONS.vi.word_compare_upload1);
