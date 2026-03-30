@@ -200,6 +200,30 @@ h3 {
     margin-top: 0.5rem;
 }
 
+.feature-card--coming-soon {
+    opacity: 0.7;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.feature-card--coming-soon:hover {
+    transform: none;
+    box-shadow: var(--shadow);
+}
+
+.feature-badge {
+    display: inline-block;
+    background: var(--warning-color);
+    color: #000;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    TABS
    ════════════════════════════════════════════════════════════════════════════*/

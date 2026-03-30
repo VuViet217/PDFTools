@@ -91,6 +91,10 @@ const TRANSLATIONS = {
     tool_image_desc:     "Chuyển đổi, nén, thay đổi kích thước ảnh",
     btn_use_now:         "Sử dụng",
     coming_soon:         "Sắp ra mắt",
+    
+    // OCR Scanner
+    ocr_title:           "Quét OCR",
+    ocr_desc:            "Nhận dạng text từ ảnh, chuyển đổi ảnh thành văn bản",
 
     // Image Converter
     image_converter_title: "Chuyển đổi ảnh",
@@ -201,6 +205,10 @@ const TRANSLATIONS = {
     btn_use_now:         "使用",
     coming_soon:         "近日公開",
 
+    // OCR Scanner
+    ocr_title:           "OCR スキャン",
+    ocr_desc:            "画像からテキストを認識、画像をテキストに変換",
+
     // Image Converter
     nav_pdf_tools:       "PDF ツール",
     nav_image_converter: "画像変換",
@@ -229,9 +237,10 @@ const TRANSLATIONS = {
 // 現在の言語（localStorageから取得、デフォルトは"vi"）
 let currentLang = localStorage.getItem("lang") || "vi";
 
-// keyに基づいてテキストを取得する関数
+// キーに基づいてテキストを取得する関数
 function t(key) {
-  return TRANSLATIONS[currentLang][key] || key;
+  const translation = TRANSLATIONS[currentLang][key] || key;
+  return translation;
 }
 
 // 全DOM にタイムズ適用
@@ -271,3 +280,9 @@ if (document.readyState === "loading") {
 } else {
   applyLang();
 }
+
+// Debug: kiểm tra xem bản dịch có được load đúng không
+console.log("[i18n] Current language:", currentLang);
+console.log("[i18n] Available keys in VI:", Object.keys(TRANSLATIONS.vi));
+console.log("[i18n] ocr_title VI:", TRANSLATIONS.vi.ocr_title);
+console.log("[i18n] ocr_desc VI:", TRANSLATIONS.vi.ocr_desc);
