@@ -2,6 +2,7 @@ import os
 import logging
 import asyncio
 import time
+import uuid
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -107,10 +108,28 @@ app.add_middleware(
 # Visitor tracking middleware
 @app.middleware("http")
 async def track_visitors(request, call_next):
-    """Theo dõi số lượng người dùng truy cập"""
+    """Theo dõi số lượng người dùng truy cập - mỗi phiên chỉ tính 1 lần"""
     client_ip = request.client.host if request.client else "unknown"
-    visitor_tracker.track_visit(client_ip)
+    
+    # Lấy session_id từ cookie, nếu không có thì tạo mới
+    session_id = request.cookies.get("session_id")
+    if not session_id:
+        session_id = str(uuid.uuid4())
+    
+    # Track visit với session_id
+    visitor_tracker.track_visit(session_id, client_ip)
+    
     response = await call_next(request)
+    
+    # Set cookie với session_id (15 ngày)
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        max_age=15*24*60*60,  # 15 days
+        httponly=True,
+        samesite="lax"
+    )
+    
     return response
 
 # Mount static files
