@@ -2,18 +2,38 @@
 (function() {
     const FOOTER_ID = "appFooter";
     
-    // Tạo footer HTML
+    // Tạo footer HTML - Trực tiếp access TRANSLATIONS từ i18n.js
     function createFooter() {
+        // Lấy ngôn ngữ hiện tại từ window scope (set bởi i18n.js)
+        const lang = window.currentLang || localStorage.getItem("lang") || "vi";
+        const trans = window.TRANSLATIONS && window.TRANSLATIONS[lang] ? window.TRANSLATIONS[lang] : {};
+        
+        // Debug log
+        console.log('[footer] Current lang:', lang);
+        console.log('[footer] Translations object:', window.TRANSLATIONS);
+        console.log('[footer] Footer brand (trans):', trans.footer_brand);
+        
+        // Lấy text từ TRANSLATIONS hoặc dùng fallback Việt
+        const fallbackBrand = "Được phát triển bởi <strong>Việt Đinh - IT OVNC</strong> • Hệ thống nội bộ — Chỉ dành cho nhân viên công ty";
+        const fallbackOnline = "Online";
+        const fallbackVisits = "Tổng truy cập";
+        
+        const brandText = trans.footer_brand || fallbackBrand;
+        const onlineLabel = trans.footer_online || fallbackOnline;
+        const totalVisitsLabel = trans.footer_total_visits || fallbackVisits;
+        
+        console.log('[footer] Using brandText:', brandText);
+        
         const footerHTML = `
             <footer class="app-footer">
                 <div class="footer-container">
                     <div class="footer-brand">
-                        <p>Được phát triển bởi <strong>Việt Đinh - IT OVNC</strong> • Hệ thống nội bộ — Chỉ dành cho nhân viên công ty</p>
+                        <p>${brandText}</p>
                     </div>
                     <div class="footer-stats">
-                        <span class="stat-item">👥 Online: <strong id="currentVisitors">-</strong></span>
+                        <span class="stat-item">👥 ${onlineLabel}: <strong id="currentVisitors">-</strong></span>
                         <span class="stat-separator">|</span>
-                        <span class="stat-item">📊 Tổng truy cập: <strong id="totalVisits">-</strong></span>
+                        <span class="stat-item">📊 ${totalVisitsLabel}: <strong id="totalVisits">-</strong></span>
                     </div>
                 </div>
             </footer>
@@ -144,6 +164,25 @@
         loadVisitorStats();
         setInterval(loadVisitorStats, 10000);
     }
+    
+    // Lắng nghe sự thay đổi ngôn ngữ (attach OUTSIDE init để chắc chắn được attach ngay)
+    document.addEventListener('languageChanged', function() {
+        const footerContainer = document.getElementById(FOOTER_ID);
+        if (footerContainer) {
+            footerContainer.innerHTML = createFooter();
+            // Reload stats khi đổi ngôn ngữ
+            loadVisitorStats();
+        }
+    });
+    
+    // Export updateFooter function để i18n.js có thể gọi
+    window.updateFooter = function() {
+        const footerContainer = document.getElementById(FOOTER_ID);
+        if (footerContainer) {
+            footerContainer.innerHTML = createFooter();
+            loadVisitorStats();
+        }
+    };
     
     // Đợi DOM ready
     if (document.readyState === 'loading') {

@@ -176,6 +176,11 @@ const TRANSLATIONS = {
     btn_pdf_to_image: "🖼️ CHUYỂN ĐỔI",
     pdf_to_image_success: "Chuyển đổi thành công!",
     pdf_to_image_images: "ảnh",
+
+    // Footer
+    footer_brand: "Được phát triển bởi <strong>Việt Đinh - IT OVNC</strong> • Hệ thống nội bộ — Chỉ dành cho nhân viên công ty",
+    footer_online: "Online",
+    footer_total_visits: "Tổng truy cập",
   },
 
   ja: {
@@ -351,11 +356,25 @@ const TRANSLATIONS = {
     btn_pdf_to_image: "🖼️ 変換",
     pdf_to_image_success: "変換に成功しました！",
     pdf_to_image_images: "画像",
+
+    // Footer
+    footer_brand: "<strong>Việt Đinh - IT OVNC</strong> が開発 • 社内システム — 社員専用",
+    footer_online: "オンライン",
+    footer_total_visits: "総アクセス数",
   }
 };
 
+// Expose global variables cho các scripts khác (như footer.js)
+window.TRANSLATIONS = TRANSLATIONS;
+
 // 現在の言語（localStorageから取得、デフォルトは"vi"）
 let currentLang = localStorage.getItem("lang") || "vi";
+
+// Expose currentLang tới window scope
+Object.defineProperty(window, 'currentLang', {
+  get: function() { return currentLang; },
+  set: function(val) { currentLang = val; }
+});
 
 // キーに基づいてテキストを取得する関数
 function t(key) {
@@ -385,6 +404,11 @@ function applyLang() {
 
   // Trigger custom event for page-specific updates
   document.dispatchEvent(new CustomEvent("languageChanged", { detail: { lang: currentLang } }));
+  
+  // Gọi updateFooter nếu footer.js đã load
+  if (typeof window.updateFooter === 'function') {
+    window.updateFooter();
+  }
 }
 
 // 言語の切り替え（言語切り替えボタンに割り当て）
