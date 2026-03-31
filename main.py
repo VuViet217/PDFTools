@@ -19,6 +19,9 @@ from routers.word_compare import router as word_compare_router
 from routers.excel_compare import router as excel_compare_router
 from routers.pdf_to_image import router as pdf_to_image_router
 
+# Import services
+from services.visitor_tracker import visitor_tracker
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -100,6 +103,15 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["X-Original-Size", "X-New-Size"] # Mở headers để JS đọc % nén
 )
+
+# Visitor tracking middleware
+@app.middleware("http")
+async def track_visitors(request, call_next):
+    """Theo dõi số lượng người dùng truy cập"""
+    client_ip = request.client.host if request.client else "unknown"
+    visitor_tracker.track_visit(client_ip)
+    response = await call_next(request)
+    return response
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -187,6 +199,12 @@ async def manual_cleanup():
     """Xóa file tạm cũ - gọi khi người dùng đóng tab/trình duyệt"""
     cleanup_old_files()
     return {"status": "cleaned"}
+
+# Visitor stats endpoint
+@app.get("/api/visitor-stats")
+async def get_visitor_stats():
+    """Lấy thống kê truy cập"""
+    return visitor_tracker.get_stats()
 
 # Health check
 @app.get("/health")
