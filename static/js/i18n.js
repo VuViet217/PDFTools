@@ -166,6 +166,16 @@ const TRANSLATIONS = {
     view_summary: "Tóm Tắt",
     view_detailed: "Chi Tiết",
     btn_download: "⬇ Tải Excel",
+    
+    // PDF to Image
+    pdf_to_image_title: "Chuyển đổi PDF sang Ảnh",
+    pdf_to_image_desc: "Chuyển đổi PDF thành ảnh PNG hoặc JPG với chất lượng cao",
+    upload_pdf_to_image_hint: "Kéo thả file PDF vào đây hoặc click để chọn",
+    pdf_to_image_format: "Định dạng ảnh",
+    pdf_to_image_quality: "Chất lượng ảnh",
+    btn_pdf_to_image: "🖼️ CHUYỂN ĐỔI",
+    pdf_to_image_success: "Chuyển đổi thành công!",
+    pdf_to_image_images: "ảnh",
   },
 
   ja: {
@@ -331,6 +341,16 @@ const TRANSLATIONS = {
     view_summary: "サマリー",
     view_detailed: "詳細",
     btn_download: "⬇ Excelをダウンロード",
+    
+    // PDF to Image
+    pdf_to_image_title: "PDFを画像に変換",
+    pdf_to_image_desc: "PDFをPNGまたはJPG画像に高品質で変換します",
+    upload_pdf_to_image_hint: "PDFファイルをここにドラッグするか、クリックして選択",
+    pdf_to_image_format: "画像フォーマット",
+    pdf_to_image_quality: "画像品質",
+    btn_pdf_to_image: "🖼️ 変換",
+    pdf_to_image_success: "変換に成功しました！",
+    pdf_to_image_images: "画像",
   }
 };
 

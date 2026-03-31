@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="pdf_to_image_title">Chuyển đổi PDF sang Ảnh</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.0">
+    <script src="/static/js/i18n.js?v=2.0"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span>← PDF Tools</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/split-merge" class="nav-link" data-i18n="nav_split_merge">Tách / Nối PDF</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/editor" class="nav-link" data-i18n="nav_editor">Chỉnh sửa PDF</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/compress" class="nav-link" data-i18n="nav_compress">Nén PDF</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/security" class="nav-link" data-i18n="nav_security">Bảo mật</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pdf-to-image" class="nav-link" data-i18n="pdf_to_image_title">Chuyển đổi PDF sang Ảnh</a>
+                </li>
+            </ul>
+            
+            <!-- Language Toggle Button -->
+            <button class="lang-toggle" onclick="toggleLang()" data-i18n="lang_switch_btn">🇯🇵 日本語</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h1 data-i18n="pdf_to_image_title">Chuyển đổi PDF sang Ảnh</h1>
+            <p data-i18n="pdf_to_image_desc" style="color: #666; margin-bottom: 2rem;">Chuyển đổi PDF thành ảnh PNG hoặc JPG với chất lượng cao</p>
+            
+            <!-- Upload area -->
+            <div id="pdfToImageUploadArea" class="upload-area">
+                <p data-i18n="upload_pdf_to_image_hint">Kéo thả file PDF vào đây hoặc click để chọn</p>
+                <input type="file" id="pdfToImageFileInput" accept=".pdf" style="display:none;">
+            </div>
+            
+            <!-- File info -->
+            <div id="pdfToImageFileInfo" class="file-info" style="display:none;">
+                <p>File: <span id="pdfToImageFileName"></span></p>
+                <p>Kích thước: <span id="pdfToImageFileSize"></span></p>
+                <p>Số trang: <span id="pdfToImagePageCount"></span></p>
+                <div id="pdfToImagePreview" style="margin-top: 1rem; text-align: center;">
+                    <img id="pdfToImagePreviewImg" style="max-width: 200px; max-height: 250px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" alt="Preview">
+                </div>
+            </div>
+            
+            <!-- Conversion options -->
+            <div id="conversionOptions" style="display:none; margin: 2rem 0; padding: 1.5rem; background: #f5f5f5; border-radius: 8px;">
+                <div class="option-group">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                        <span data-i18n="pdf_to_image_format">Định dạng ảnh</span>
+                    </label>
+                    <select id="pdfToImageFormat" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        <option value="png">PNG (Không mất chất lượng)</option>
+                        <option value="jpg">JPG (Nén tốt)</option>
+                    </select>
+                </div>
+                
+                <div class="option-group" style="margin-top: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                        <span data-i18n="pdf_to_image_quality">Chất lượng ảnh</span>: <span id="qualityValue">85</span>%
+                    </label>
+                    <input type="range" id="pdfToImageQuality" min="50" max="100" value="85" style="width: 100%; cursor: pointer;">
+                    <small style="color: #666;">50% - 100% (Chỉ áp dụng cho JPG)</small>
+                </div>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="button-group">
+                <button id="pdfToImageBtn" class="btn btn-primary" data-i18n="btn_pdf_to_image" disabled>🖼️ CHUYỂN ĐỔI</button>
+                <button id="pdfToImageResetBtn" class="btn btn-secondary" data-i18n="reset_btn" style="display:none;">↻ RESET</button>
+            </div>
+            
+            <!-- Progress -->
+            <div id="conversionProgress" style="display:none; margin-top: 2rem; text-align: center;">
+                <div class="spinner"></div>
+                <p data-i18n="processing">Đang xử lý...</p>
+                <p id="conversionStatus" style="color: #999; font-size: 14px;"></p>
+            </div>
+            
+            <!-- Result -->
+            <div id="pdfToImageResult" style="display:none; text-align: left; margin-top: 1.5rem; background: #e6f7e6; border-left: 4px solid var(--success-color); padding: 1rem; border-radius: 4px;">
+                <p style="margin-bottom: 1rem; color: #333;">
+                    ✅ <span data-i18n="pdf_to_image_success">Chuyển đổi thành công!</span> 
+                    (<span id="imageCount">0</span> <span data-i18n="pdf_to_image_images">ảnh</span>)
+                </p>
+                <a id="pdfToImageDownloadBtn" class="btn btn-success" data-i18n="btn_download">⬇ TẢI XUỐNG</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p data-i18n="footer_text">Hệ thống nội bộ — Chỉ dành cho nhân viên công ty</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add("remove");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Tự động dọn dẹp file tạm khi người dùng đóng tab
+        window.addEventListener("beforeunload", function() {
+            navigator.sendBeacon("/api/cleanup");
+        });
+    </script>
+
+    <script src="/static/js/pdf_to_image.js"></script>
+</body>
+</html>

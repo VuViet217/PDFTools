@@ -17,6 +17,7 @@ from routers.security import router as security_router
 from routers.image_converter import router as image_converter_router
 from routers.word_compare import router as word_compare_router
 from routers.excel_compare import router as excel_compare_router
+from routers.pdf_to_image import router as pdf_to_image_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -112,6 +113,7 @@ app.include_router(security_router, prefix="/api", tags=["security"])
 app.include_router(image_converter_router, prefix="/api", tags=["image_converter"])
 app.include_router(word_compare_router, prefix="/api", tags=["word_compare"])
 app.include_router(excel_compare_router, prefix="/api", tags=["excel_compare"])
+app.include_router(pdf_to_image_router, prefix="/api", tags=["pdf_to_image"])
 
 # Root route - serve tools.html (main dashboard)
 @app.get("/", response_class=HTMLResponse)
@@ -123,6 +125,12 @@ async def read_root():
 @app.get("/pdf", response_class=HTMLResponse)
 async def pdf_page():
     with open("templates/index.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# PDF to Image page
+@app.get("/pdf-to-image", response_class=HTMLResponse)
+async def pdf_to_image_page():
+    with open("templates/pdf_to_image.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Split/Merge page
