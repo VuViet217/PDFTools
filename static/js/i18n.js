@@ -171,7 +171,7 @@ const TRANSLATIONS = {
     excel_compare_unchanged: "Dòng giữ nguyên",
     view_summary: "Tóm Tắt",
     view_detailed: "Chi Tiết",
-    btn_download: "⬇ Tải Excel",
+    btn_download: "⬇ Tải xuống",
     
     // PDF to Image
     pdf_to_image_title: "Chuyển đổi PDF sang Ảnh",
@@ -362,7 +362,7 @@ const TRANSLATIONS = {
     excel_compare_unchanged: "変更されていないロー",
     view_summary: "サマリー",
     view_detailed: "詳細",
-    btn_download: "⬇ Excelをダウンロード",
+    btn_download: "⬇ ダウンロード",
     
     // PDF to Image
     pdf_to_image_title: "PDFを画像に変換",
