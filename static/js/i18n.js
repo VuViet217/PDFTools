@@ -187,6 +187,11 @@ const TRANSLATIONS = {
     footer_brand: "Được phát triển bởi <strong>Việt Đinh - IT OVNC</strong> • Hệ thống nội bộ — Chỉ dành cho nhân viên công ty",
     footer_online: "Online",
     footer_total_visits: "Tổng truy cập",
+
+    // 404 Error Page
+    error_404_title: "Trang không tìm thấy",
+    error_404_description: "Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị xóa. Vui lòng kiểm tra URL hoặc quay lại trang chủ.",
+    error_404_action: "← Quay lại trang chủ",
   },
 
   ja: {
@@ -373,6 +378,11 @@ const TRANSLATIONS = {
     footer_brand: "<strong>Việt Đinh - IT OVNC</strong> が開発 • 社内システム — 社員専用",
     footer_online: "オンライン",
     footer_total_visits: "総アクセス数",
+
+    // 404 Error Page
+    error_404_title: "ページが見つかりません",
+    error_404_description: "申し訳ございません。お探しのページが存在しないか削除されています。URLを確認するか、ホームページに戻りください。",
+    error_404_action: "← ホームへ戻る",
   }
 };
 

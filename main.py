@@ -258,6 +258,13 @@ async def get_client_ip(request: Request):
 async def health_check():
     return {"status": "ok", "app": "PDF Tools"}
 
+# 404 Error Page - Catch all undefined routes
+@app.get("/{full_path:path}")
+async def catch_all(full_path: str):
+    """Xử lý tất cả route không được định nghĩa và trả về trang 404"""
+    with open("templates/404.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read(), status_code=404)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
