@@ -3,8 +3,9 @@ import logging
 import asyncio
 import time
 import uuid
+import socket
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,6 +31,25 @@ logger = logging.getLogger(__name__)
 # Create uploads directory if not exists
 UPLOADS_DIR = Path("uploads")
 UPLOADS_DIR.mkdir(exist_ok=True)
+
+# Hàm lấy IP LAN của máy tính
+def get_local_ip():
+    """Lấy IP LAN của máy tính hiện tại"""
+    try:
+        # Tạo socket để xác định IP LAN (không thực sự connect)
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        try:
+            # Fallback: lấy từ hostname
+            hostname = socket.gethostname()
+            ip = socket.gethostbyname(hostname)
+            return ip
+        except:
+            return "127.0.0.1"
 
 # Hàm chạy ngầm dọn rác định kỳ (Mỗi 5 phút dọn 1 lần các file quá cũ - nhanh hơn cho image files)
 def cleanup_old_files():
@@ -224,6 +244,14 @@ async def manual_cleanup():
 async def get_visitor_stats():
     """Lấy thống kê truy cập"""
     return visitor_tracker.get_stats()
+
+# Client IP endpoint
+@app.get("/api/client-ip")
+async def get_client_ip(request: Request):
+    """Lấy IP LAN của máy tính (server)"""
+    # Lấy IP LAN của máy chủ, không phải IP của client request
+    ip = get_local_ip()
+    return {"ip": ip}
 
 # Health check
 @app.get("/health")

@@ -32,6 +32,8 @@
                         <p>${brandText}</p>
                     </div>
                     <div class="footer-stats">
+                        <span class="stat-item">🌐 IP: <strong id="userIP" title="Your IP address">-</strong></span>
+                        <span class="stat-separator">|</span>
                         <span class="stat-item">👥 ${onlineLabel}: <strong id="currentVisitors">-</strong></span>
                         <span class="stat-separator">|</span>
                         <span class="stat-item">📊 ${totalVisitsLabel}: <strong id="totalVisits">-</strong></span>
@@ -125,6 +127,28 @@
         document.head.appendChild(style);
     }
     
+    // Fetch user IP address (from server)
+    async function loadUserIP() {
+        try {
+            const response = await fetch('/api/client-ip');
+            if (!response.ok) throw new Error('Failed to fetch IP');
+            
+            const data = await response.json();
+            const userIPEl = document.getElementById('userIP');
+            
+            if (userIPEl && data.ip) {
+                userIPEl.textContent = data.ip;
+                console.log('[footer] Client IP loaded:', data.ip);
+            }
+        } catch (error) {
+            console.warn('Error loading client IP:', error);
+            const userIPEl = document.getElementById('userIP');
+            if (userIPEl) {
+                userIPEl.textContent = 'N/A';
+            }
+        }
+    }
+    
     // Fetch visitor stats từ API
     async function loadVisitorStats() {
         try {
@@ -160,6 +184,9 @@
         }
         
         footerContainer.innerHTML = createFooter();
+        
+        // Load IP ngay khi footer được tạo
+        loadUserIP();
         
         // Load stats ngay và cập nhật mỗi 10 giây
         loadVisitorStats();
