@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="nav_editor">Chỉnh sửa PDF</title>
     <link rel="stylesheet" href="/static/css/style.css?v=2.0">
-    <script src="/static/js/i18n.js?v=2.1"></script>
+    <script src="/static/js/i18n.js?v=2.7"></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -32,9 +32,6 @@
                     <a href="/pdf-to-image" class="nav-link" data-i18n="pdf_to_image_title">Chuyển đổi PDF sang Ảnh</a>
                 </li>
             </ul>
-            
-            <!-- Language Toggle Button -->
-            <button class="lang-toggle" onclick="toggleLang()" data-i18n="lang_switch_btn">🇯🇵 日本語</button>
         </div>
     </nav>
 
@@ -141,6 +138,6 @@
             navigator.sendBeacon("/api/cleanup");
         });    </script>
     <script src="/static/js/editor.js?v=1.3"></script>
-    <script src="/static/js/footer.js?v=2.0"></script>
+    <script src="/static/js/footer.js?v=2.2"></script>
 </body>
 </html>

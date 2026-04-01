@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OVNC Tools</title>
+    <script src="/static/js/i18n.js?v=2.7"></script>
     <style>
         * {
             margin: 0;
@@ -260,8 +261,8 @@
     <div class="topbar">
         <div class="logo">OVNC</div>
         <div class="language-switcher">
-            <button class="lang-btn active" onclick="changeLanguage('vi')">VN</button>
-            <button class="lang-btn" onclick="changeLanguage('ja')">JP</button>
+            <button class="lang-btn lang-btn-vi active" onclick="setLang('vi')">VN</button>
+            <button class="lang-btn lang-btn-ja" onclick="setLang('ja')">JP</button>
         </div>
     </div>
 
@@ -323,84 +324,11 @@
     </div>
 
     <script>
-        function changeLanguage(lang) {
-            localStorage.setItem('language', lang);
-            document.documentElement.lang = lang;
-            updateTranslations(lang);
-            
-            // Update language buttons
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-        }
-
-        function updateTranslations(lang) {
-            const translations = {
-                vi: {
-                    company_tools: "Công Cụ",
-                    company_tools_subtitle: "Bộ công cụ xử lý dữ liệu nội bộ dành cho nhân viên",
-                    tool_pdf: "PDF Tools",
-                    tool_pdf_desc: "Tách, nối, chỉnh sửa, nén, bảo mật PDF",
-                    tool_image: "Chuyển đổi ảnh",
-                    tool_image_desc: "Chuyển đổi, nén, thay đổi kích thước ảnh",
-                    tool_password: "Tạo Mật Khẩu",
-                    tool_password_desc: "Tạo mật khẩu ngẫu nhiên mạnh với tùy chỉnh",
-                    tool_word_compare: "So Sánh Word",
-                    tool_word_compare_desc: "So sánh 2 file Word (.docx) và highlight sự khác biệt",
-                    tool_excel_compare: "So Sánh Excel",
-                    tool_excel_compare_desc: "So sánh 2 file Excel (.xlsx) và highlight dữ liệu thay đổi",
-                    ocr_title: "Quét OCR",
-                    ocr_desc: "Nhận dạng text từ ảnh, chuyển đổi ảnh thành văn bản",
-                    btn_use_now: "Sử dụng",
-                    coming_soon: "Sắp ra mắt"
-                },
-                ja: {
-                    company_tools: "ツール",
-                    company_tools_subtitle: "従業員向けの内部データ処理ツール",
-                    tool_pdf: "PDF ツール",
-                    tool_pdf_desc: "PDF を分割、結合、編集、圧縮、保護",
-                    tool_image: "画像変換",
-                    tool_image_desc: "画像を変換、圧縮、リサイズする",
-                    tool_password: "パスワード生成",
-                    tool_password_desc: "強力でカスタマイズ可能なランダムパスワードを生成",
-                    tool_word_compare: "Word比較",
-                    tool_word_compare_desc: "2つのWordファイル(.docx)を比較して差分をハイライト表示",
-                    tool_excel_compare: "Excel比較",
-                    tool_excel_compare_desc: "2つのExcelファイル(.xlsx)を比較して変更データをハイライト表示",
-                    ocr_title: "OCR スキャン",
-                    ocr_desc: "画像からテキストを認識、画像をテキストに変換",
-                    btn_use_now: "使用",
-                    coming_soon: "近日公開"
-                }
-            };
-
-            document.querySelectorAll('[data-i18n]').forEach(element => {
-                const key = element.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    element.textContent = translations[lang][key];
-                }
-            });
-        }
-
-        // Load saved language on page load
-        const savedLang = localStorage.getItem('language') || 'vi';
-        document.documentElement.lang = savedLang;
-        updateTranslations(savedLang);
-        
-        // Update language button state
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            if ((savedLang === 'vi' && btn.textContent.includes('VN')) ||
-                (savedLang === 'ja' && btn.textContent.includes('JP'))) {
-                btn.classList.add('active');
-            }
-        });
-
         // Tự động dọn dẹp file tạm khi người dùng đóng tab
         window.addEventListener("beforeunload", function() {
             navigator.sendBeacon("/api/cleanup");
         });
     </script>
-    <script src="/static/js/footer.js?v=2.0"></script>
+    <script src="/static/js/footer.js?v=2.2"></script>
 </body>
 </html>

@@ -89,6 +89,12 @@ const TRANSLATIONS = {
     tool_pdf_desc:       "Tách, nối, chỉnh sửa, nén, bảo mật PDF",
     tool_image:          "Chuyển đổi ảnh",
     tool_image_desc:     "Chuyển đổi, nén, thay đổi kích thước ảnh",
+    tool_password:       "Tạo Mật Khẩu",
+    tool_password_desc:  "Tạo mật khẩu ngẫu nhiên mạnh với tùy chỉnh",
+    tool_word_compare:   "So Sánh Word",
+    tool_word_compare_desc: "So sánh 2 file Word (.docx) và highlight sự khác biệt",
+    tool_excel_compare:  "So Sánh Excel",
+    tool_excel_compare_desc: "So sánh 2 file Excel (.xlsx) và highlight dữ liệu thay đổi",
     btn_use_now:         "Sử dụng",
     coming_soon:         "Sắp ra mắt",
     
@@ -267,6 +273,12 @@ const TRANSLATIONS = {
     tool_pdf_desc:       "PDF を分割、結合、編集、圧縮、保護",
     tool_image:          "画像変換",
     tool_image_desc:     "画像を変換、圧縮、リサイズする",
+    tool_password:       "パスワード生成",
+    tool_password_desc:  "カスタマイズ可能な強いランダムパスワードを生成する",
+    tool_word_compare:   "Word比較",
+    tool_word_compare_desc: "2つのWord ファイル (.docx) を比較して違いをハイライト",
+    tool_excel_compare:  "Excel比較",
+    tool_excel_compare_desc: "2つの Excel ファイル (.xlsx) を比較して変更データをハイライト",
     btn_use_now:         "使用",
     coming_soon:         "近日公開",
 
@@ -370,11 +382,17 @@ window.TRANSLATIONS = TRANSLATIONS;
 // 現在の言語（localStorageから取得、デフォルトは"vi"）
 let currentLang = localStorage.getItem("lang") || "vi";
 
-// Expose currentLang tới window scope
-Object.defineProperty(window, 'currentLang', {
-  get: function() { return currentLang; },
-  set: function(val) { currentLang = val; }
-});
+// Debug: Log localStorage value
+console.log("[i18n] localStorage.getItem('lang'):", localStorage.getItem("lang"));
+console.log("[i18n] Initial currentLang:", currentLang);
+
+// Expose currentLang directly to window
+window.currentLang = currentLang;
+
+// Function để lấy current language
+window.getCurrentLang = function() {
+  return currentLang;
+};
 
 // キーに基づいてテキストを取得する関数
 function t(key) {
@@ -386,10 +404,18 @@ function t(key) {
 // HTMLエレメントには data-i18n="key" 属性が必要
 // 例: <button data-i18n="btn_split">TÁCH PDF</button>
 function applyLang() {
+  console.log("[i18n] applyLang() called with currentLang:", currentLang);
+  console.log("[i18n] TRANSLATIONS[currentLang] exists:", !!TRANSLATIONS[currentLang]);
+  
   // Text content
-  document.querySelectorAll("[data-i18n]").forEach(el => {
+  const dataI18nElements = document.querySelectorAll("[data-i18n]");
+  console.log("[i18n] Elements with data-i18n:", dataI18nElements.length);
+  
+  dataI18nElements.forEach(el => {
     const key = el.getAttribute("data-i18n");
-    el.textContent = t(key);
+    const translation = t(key);
+    el.textContent = translation;
+    console.log("[i18n] Translated:", key, "=>", translation);
   });
 
   // Placeholder
@@ -414,15 +440,54 @@ function applyLang() {
 // 言語の切り替え（言語切り替えボタンに割り当て）
 function toggleLang() {
   currentLang = currentLang === "vi" ? "ja" : "vi";
+  window.currentLang = currentLang; // Update window.currentLang
   localStorage.setItem("lang", currentLang);
   applyLang();
 }
 
+// Set language (mới - sử dụng cho các button VN/JP)
+function setLang(lang) {
+  console.log("[i18n] setLang() called with:", lang);
+  if (lang !== "vi" && lang !== "ja") {
+    console.log("[i18n] Invalid language:", lang);
+    return;
+  }
+  currentLang = lang;
+  window.currentLang = currentLang;
+  console.log("[i18n] Before localStorage.setItem - localStorage.getItem('lang'):", localStorage.getItem("lang"));
+  localStorage.setItem("lang", currentLang);
+  console.log("[i18n] After localStorage.setItem - localStorage.getItem('lang'):", localStorage.getItem("lang"));
+  applyLang();
+  updateLangButtons();
+}
+
+// Update language button states
+function updateLangButtons() {
+  // Delay để chắc chắn DOM fully rendered
+  setTimeout(function() {
+    document.querySelectorAll(".lang-btn").forEach(btn => {
+      btn.classList.remove("active");
+    });
+    
+    const activeBtn = document.querySelector(".lang-btn-" + currentLang);
+    if (activeBtn) {
+      activeBtn.classList.add("active");
+    }
+    
+    console.log("[i18n] Button updated for lang:", currentLang);
+  }, 100);
+}
+
 // ページロード完了時に実行
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", applyLang);
+  document.addEventListener("DOMContentLoaded", function() {
+    applyLang();
+    // Không gọi updateLangButtons() lần load đầu vì HTML đã có active class
+    // Chi gọi khi user click buttons (inside setLang function)
+  });
 } else {
   applyLang();
+  // Không gọi updateLangButtons() lần load đầu vì HTML đã có active class
 }
 
 // Debug: kiểm tra xem bản dịch có được load đúng không

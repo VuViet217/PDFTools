@@ -4,14 +4,14 @@
     
     // Tạo footer HTML - Trực tiếp access TRANSLATIONS từ i18n.js
     function createFooter() {
-        // Lấy ngôn ngữ hiện tại từ window scope (set bởi i18n.js)
+        // Lấy ngôn ngữ hiện tại - dùng window.currentLang hoặc localStorage
         const lang = window.currentLang || localStorage.getItem("lang") || "vi";
         const trans = window.TRANSLATIONS && window.TRANSLATIONS[lang] ? window.TRANSLATIONS[lang] : {};
         
         // Debug log
-        console.log('[footer] Current lang:', lang);
-        console.log('[footer] Translations object:', window.TRANSLATIONS);
-        console.log('[footer] Footer brand (trans):', trans.footer_brand);
+        console.log('[footer] Current lang (window.currentLang):', window.currentLang);
+        console.log('[footer] Fallback lang:', lang);
+        console.log('[footer] Translations available:', !!window.TRANSLATIONS);
         
         // Lấy text từ TRANSLATIONS hoặc dùng fallback Việt
         const fallbackBrand = "Được phát triển bởi <strong>Việt Đinh - IT OVNC</strong> • Hệ thống nội bộ — Chỉ dành cho nhân viên công ty";
@@ -23,6 +23,7 @@
         const totalVisitsLabel = trans.footer_total_visits || fallbackVisits;
         
         console.log('[footer] Using brandText:', brandText);
+        console.log('[footer] Using lang:', lang, 'footer_brand:', trans.footer_brand ? '✓ found' : '✗ not found');
         
         const footerHTML = `
             <footer class="app-footer">
