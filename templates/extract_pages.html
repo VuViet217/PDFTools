@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tách Trang PDF | OVNC Tools</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.7">
+    <script src="/static/js/i18n.js?v=3.1"></script>
+    <script src="/static/js/header.js?v=1.5"></script>
+    <style>
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title-icon {
+            font-size: 40px;
+        }
+
+        .extract-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .form-group input[type="file"],
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input[type="file"]:focus,
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 8px;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+        }
+
+        .upload-area p {
+            margin: 0 0 10px 0;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .info-box {
+            display: none;
+            margin: 20px 0;
+            padding: 15px;
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            border-radius: 4px;
+            color: #2e7d32;
+            font-size: 14px;
+        }
+
+        .info-box.show {
+            display: block;
+        }
+
+        .info-box strong {
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .progress-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .progress-section.show {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .progress-text {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .example-section {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .example-section h4 {
+            margin: 0 0 12px 0;
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .example-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .example-list li {
+            padding: 6px 0;
+            color: #666;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .example-list li code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .extract-card {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .upload-area {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be injected by header.js -->
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">
+                <span class="page-title-icon">✂️</span>
+                <span>Tách Trang Cụ Thể từ PDF</span>
+            </h1>
+
+            <div class="extract-card">
+                <form id="extractForm">
+                    <!-- File Upload -->
+                    <div class="form-group">
+                        <label>Chọn file PDF:</label>
+                        <div class="upload-area" id="uploadArea">
+                            <p>📁 Kéo thả file PDF hoặc click để chọn</p>
+                            <small>Tối đa 50MB</small>
+                            <input type="file" id="extractFile" accept=".pdf" required>
+                        </div>
+                    </div>
+
+                    <!-- File Info -->
+                    <div id="fileInfo" class="info-box">
+                        <strong>File:</strong> <span id="fileName"></span><br>
+                        <strong>Tổng số trang:</strong> <span id="totalPages">0</span>
+                    </div>
+
+                    <!-- Page Range Input -->
+                    <div class="form-group">
+                        <label for="pageRange">Danh sách trang:</label>
+                        <input type="text" id="pageRange" placeholder="Ví dụ: 1,2,5-10,15" required>
+                        <small>Nhập số trang hoặc dãy trang (1-indexed). Ví dụ: 1,3,5-10,15</small>
+
+                        <div class="example-section">
+                            <h4>💡 Ví dụ cách nhập:</h4>
+                            <ul class="example-list">
+                                <li><code>1,3,5</code> → Lấy trang 1, 3, 5</li>
+                                <li><code>1-5</code> → Lấy trang 1 đến 5</li>
+                                <li><code>1,3-5,10</code> → Lấy trang 1, từ 3 đến 5, và trang 10</li>
+                                <li><code>1-10,15,20-25</code> → Kết hợp cả hai cách</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            ✂️ Tách Trang PDF
+                        </button>
+                        <button type="reset" class="btn-secondary">Xóa</button>
+                    </div>
+                </form>
+
+                <!-- Progress -->
+                <div class="progress-section" id="progressSection">
+                    <div class="progress-text">
+                        <div class="spinner"></div>
+                        <span id="progressText">Đang xử lý PDF...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add("remove");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Element references
+        const extractForm = document.getElementById('extractForm');
+        const extractFile = document.getElementById('extractFile');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const totalPages = document.getElementById('totalPages');
+        const pageRange = document.getElementById('pageRange');
+        const progressSection = document.getElementById('progressSection');
+        const progressText = document.getElementById('progressText');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => extractFile.click());
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                extractFile.files = files;
+                loadFileInfo();
+            }
+        });
+
+        // When file is selected, load file info
+        extractFile.addEventListener('change', loadFileInfo);
+
+        async function loadFileInfo() {
+            const file = extractFile.files[0];
+            if (!file) return;
+
+            fileName.textContent = file.name;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/api/info', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    totalPages.textContent = data.total_pages;
+                    fileInfo.classList.add('show');
+                } else {
+                    showToast('Không thể đọc file PDF', 'error');
+                    fileInfo.classList.remove('show');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Lỗi khi lấy thông tin file', 'error');
+                fileInfo.classList.remove('show');
+            }
+        }
+
+        // Handle form submission
+        extractForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const file = extractFile.files[0];
+            const pageRangeValue = pageRange.value;
+
+            if (!file || !pageRangeValue) {
+                showToast('Vui lòng chọn file và nhập danh sách trang', 'error');
+                return;
+            }
+
+            // Show progress
+            progressSection.classList.add('show');
+            submitBtn.disabled = true;
+            extractFile.disabled = true;
+            pageRange.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('page_range', pageRangeValue);
+
+                progressText.textContent = 'Đang xử lý PDF...';
+
+                const response = await fetch('/api/extract-pages', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    
+                    // Create download link
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `extracted_pages_${Date.now()}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+
+                    showToast('Tách trang thành công! File đang tải xuống...', 'success');
+                    
+                    // Reset form
+                    setTimeout(() => {
+                        extractForm.reset();
+                        fileInfo.classList.remove('show');
+                    }, 1000);
+                } else {
+                    const error = await response.json();
+                    showToast(`Lỗi: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Lỗi khi xử lý PDF', 'error');
+            } finally {
+                progressSection.classList.remove('show');
+                submitBtn.disabled = false;
+                extractFile.disabled = false;
+                pageRange.disabled = false;
+            }
+        });
+
+        // Auto cleanup when closing tab
+        window.addEventListener("beforeunload", function() {
+            navigator.sendBeacon("/api/cleanup");
+        });
+    </script>
+    <script src="/static/js/footer.js?v=2.5"></script>
+</body>
+</html>

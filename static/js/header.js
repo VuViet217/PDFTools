@@ -39,6 +39,7 @@ function createHeader() {
             <span class="nav-link" data-i18n="tool_pdf">PDF Tools</span>
             <div class="dropdown-menu">
               <a href="/split-merge" class="dropdown-item" data-i18n="nav_split_merge">Tách / Nối PDF</a>
+              <a href="/extract-pages" class="dropdown-item" data-i18n="nav_extract_pages">Tách Trang Cụ Thể</a>
               <a href="/editor" class="dropdown-item" data-i18n="nav_editor">Chỉnh sửa PDF</a>
               <a href="/compress" class="dropdown-item" data-i18n="nav_compress">Nén PDF</a>
               <a href="/security" class="dropdown-item" data-i18n="nav_security">Bảo mật</a>

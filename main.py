@@ -232,6 +232,12 @@ async def excel_compare_page():
     with open("templates/excel_compare.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
+# Extract Pages page
+@app.get("/extract-pages", response_class=HTMLResponse)
+async def extract_pages_page():
+    with open("templates/extract_pages.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
 # Manual cleanup endpoint - người dùng có thể gọi khi kết thúc session
 @app.post("/api/cleanup")
 async def manual_cleanup():

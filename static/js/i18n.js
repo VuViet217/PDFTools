@@ -32,6 +32,15 @@ const TRANSLATIONS = {
     file_list_label:     "Danh sách file",
     drag_to_reorder:     "Kéo để sắp xếp",
 
+    // Extract Pages
+    extract_pages_btn:   "✂️ Tách Trang Cụ Thể",
+    extract_title:       "Tách Trang Cụ Thể từ PDF",
+    extract_page_range:  "Danh sách trang",
+    extract_hint:        "Nhập số trang hoặc dãy trang (1-indexed). Ví dụ: 1,3,5-10,15",
+    extract_total_pages: "Tổng số trang",
+    extract_btn:         "Tách Trang PDF",
+    extract_success:     "Tách trang thành công! File đang tải xuống...",
+
     // Trang Editor
     editor_title:        "Chỉnh sửa PDF",
     upload_pdf_editor:   "Upload PDF để bắt đầu chỉnh sửa",
@@ -220,6 +229,15 @@ const TRANSLATIONS = {
     tab_merge_section:   "結合",
     file_list_label:     "ファイルリスト",
     drag_to_reorder:     "ドラッグして並べ替え",
+
+    // Extract Pages
+    extract_pages_btn:   "✂️ 特定ページを抽出",
+    extract_title:       "PDFから特定ページを抽出",
+    extract_page_range:  "ページリスト",
+    extract_hint:        "ページ番号または範囲を入力（1始まり）。例：1,3,5-10,15",
+    extract_total_pages: "総ページ数",
+    extract_btn:         "PDFページを抽出",
+    extract_success:     "ページの抽出に成功しました！ファイルをダウンロード中...",
 
     // Editor
     editor_title:        "PDF 編集",

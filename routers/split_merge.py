@@ -10,6 +10,7 @@ from pathlib import Path
 
 from services.pdf_split import split_pdf
 from services.pdf_merge import merge_pdfs
+from services.extract_pages import extract_pages
 
 router = APIRouter()
 
@@ -106,6 +107,67 @@ async def get_pdf_info(file: UploadFile = File(...)):
             "success": True,
             "total_pages": len(reader.pages)
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/extract-pages")
+async def extract_pages_endpoint(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    page_range: str = Form("")
+):
+    """
+    API endpoint tách/trích xuất các trang cụ thể từ PDF
+    Trả về 1 file PDF mới chỉ chứa các trang được chỉ định
+    
+    Request:
+        - file: PDF upload
+        - page_range: Danh sách trang (VD: "1,2,5-10")
+    
+    Response:
+        - File: PDF chỉ chứa các trang đã chọn
+    """
+    try:
+        # Validate input
+        if not page_range or not page_range.strip():
+            raise HTTPException(status_code=400, detail="Vui lòng nhập danh sách trang")
+        
+        # Kiểm tra file type
+        if file.content_type not in ["application/pdf"]:
+            raise HTTPException(status_code=400, detail="File phải là PDF")
+        
+        # Kiểm tra kích thước (50MB max)
+        contents = await file.read()
+        if len(contents) > 50 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail="File quá lớn (max 50MB)")
+        
+        try:
+            # Gọi service extract pages (xử lý hoàn toàn trong memory)
+            output_pdf = extract_pages(contents, page_range.strip())
+            
+            # Tạo file tạm để trả về
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False, dir=UPLOADS_DIR) as tmp:
+                tmp.write(output_pdf)
+                tmp_path = tmp.name
+                tmp_filename = os.path.basename(tmp_path)
+            
+            # Xóa file sau khi tải về
+            background_tasks.add_task(remove_file, tmp_path)
+            
+            return FileResponse(
+                tmp_path,
+                filename=f"extracted_{tmp_filename}",
+                media_type="application/pdf"
+            )
+        
+        except ValueError as e:
+            # Lỗi từ page range parsing
+            raise HTTPException(status_code=400, detail=f"Lỗi danh sách trang: {str(e)}")
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Lỗi xử lý PDF: {str(e)}")
+    
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
