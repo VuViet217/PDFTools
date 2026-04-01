@@ -84,7 +84,7 @@ const TRANSLATIONS = {
     
     // Tools Dashboard
     company_tools:       "Công Cụ",
-    company_tools_subtitle: "Bộ công cụ xử lý dữ liệu nội bộ dành cho nhân viên",
+    company_tools_subtitle: "Bộ công cụ giúp bạn làm việc nhanh hơn tại OVNC",
     tool_pdf:            "PDF Tools",
     tool_pdf_desc:       "Tách, nối, chỉnh sửa, nén, bảo mật PDF",
     tool_image:          "Chuyển đổi ảnh",
@@ -268,7 +268,7 @@ const TRANSLATIONS = {
 
     // Tools Dashboard
     company_tools:       "ツール",
-    company_tools_subtitle: "従業員向けの内部データ処理ツール",
+    company_tools_subtitle: "OVNC での仕事をより高速化するツール集",
     tool_pdf:            "PDF ツール",
     tool_pdf_desc:       "PDF を分割、結合、編集、圧縮、保護",
     tool_image:          "画像変換",

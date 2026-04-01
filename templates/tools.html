@@ -3,125 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OVNC Tools</title>
-    <script src="/static/js/i18n.js?v=2.7"></script>
+    <title>OVNC Tools - Bộ công cụ xử lý dữ liệu</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.6">
+    <script src="/static/js/i18n.js?v=2.9"></script>
+    <script src="/static/js/header.js?v=1.5"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #fafbfc;
-            min-height: 100vh;
-            padding: 0;
-        }
-
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: white;
-            border-bottom: 1px solid #efefef;
-            padding: 0 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a73e8;
-            letter-spacing: -0.5px;
-        }
-
-        .language-switcher {
-            display: flex;
-            gap: 8px;
-        }
-
-        .lang-btn {
-            background: white;
-            border: 1px solid #dadce0;
-            color: #3c4043;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 13px;
-            transition: all 0.2s ease;
-        }
-
-        .lang-btn.active {
-            background: #1a73e8;
+        .main-content {
+            flex: 1;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-color: #1a73e8;
         }
 
-        .lang-btn:hover:not(.active) {
-            border-color: #1a73e8;
-            color: #1a73e8;
-        }
-
-        .container {
-            max-width: 1400px;
+        .hero-section {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 50px 20px;
-            min-height: calc(100vh - 60px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .header {
-            margin-bottom: 50px;
             text-align: center;
-            width: 100%;
+            margin-bottom: 30px;
         }
 
-        .header h1 {
-            font-size: 42px;
-            color: #1a1a1a;
-            margin-bottom: 12px;
+        .hero-section h1 {
+            font-size: 48px;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        .header p {
+        .hero-section p {
+            font-size: 20px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .tools-section {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: white;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .section-title p {
             font-size: 18px;
-            color: #666666;
-            font-weight: 400;
+            opacity: 0.9;
         }
 
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 28px;
-            width: 100%;
-            max-width: 900px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 60px;
         }
 
         .tool-card {
             background: white;
             border-radius: 12px;
-            padding: 32px 24px;
+            padding: 20px 16px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #f0f0f0;
+            position: relative;
         }
 
         .tool-card::before {
@@ -130,72 +84,67 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: #1a73e8;
-            transition: all 0.3s ease;
-        }
-
-        .tool-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            border-color: #e8f0fe;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
         }
 
         .tool-card:hover::before {
-            height: 4px;
+            transform: scaleX(1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(102, 126, 234, 0.25);
         }
 
         .tool-card.coming-soon {
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
-
-        .tool-card.coming-soon:hover {
-            transform: none;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
-        }
-
-        .tool-card.coming-soon::before {
-            background: #d0d0d0;
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         .tool-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+            font-size: 44px;
+            margin-bottom: 10px;
+            display: block;
         }
 
         .tool-name {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #1a1a1a;
             margin-bottom: 8px;
         }
 
         .tool-description {
-            font-size: 14px;
+            font-size: 13px;
             color: #666666;
-            margin-bottom: 20px;
-            line-height: 1.6;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            min-height: 35px;
             flex-grow: 1;
         }
 
-        .tool-card a {
+        .tool-card a, .tool-card button {
             display: inline-block;
-            background: #1a73e8;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 10px 24px;
+            padding: 8px 20px;
             border-radius: 6px;
             text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
+            font-weight: 600;
+            font-size: 13px;
             transition: all 0.2s ease;
             border: none;
             cursor: pointer;
         }
 
-        .tool-card a:hover {
-            background: #1765cc;
-            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+        .tool-card a:hover, .tool-card button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
         }
 
         .coming-soon-badge {
@@ -204,38 +153,31 @@
             color: #e65100;
             padding: 6px 12px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             margin-top: 12px;
         }
 
         @media (max-width: 768px) {
-            .topbar {
-                padding: 0 20px;
-                height: 50px;
+            .main-content {
+                padding: 40px 20px;
             }
 
-            .logo {
-                font-size: 20px;
+            .hero-section {
+                margin-bottom: 50px;
             }
 
-            .container {
-                margin-top: 0;
-                padding: 40px 16px;
-            }
-
-            .header h1 {
+            .hero-section h1 {
                 font-size: 32px;
             }
 
-            .header p {
+            .hero-section p {
                 font-size: 16px;
             }
 
             .tools-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                grid-template-columns: 1fr;
                 gap: 20px;
-                max-width: 100%;
             }
 
             .tool-card {
@@ -244,91 +186,83 @@
 
             .tool-icon {
                 font-size: 40px;
-                margin-bottom: 12px;
+                margin-bottom: 16px;
             }
 
             .tool-name {
-                font-size: 16px;
-            }
-
-            .tool-description {
-                font-size: 13px;
+                font-size: 18px;
             }
         }
     </style>
 </head>
-<body>
-    <div class="topbar">
-        <div class="logo">OVNC</div>
-        <div class="language-switcher">
-            <button class="lang-btn lang-btn-vi active" onclick="setLang('vi')">VN</button>
-            <button class="lang-btn lang-btn-ja" onclick="setLang('ja')">JP</button>
-        </div>
-    </div>
+<body style="margin: 0; padding: 0;">
+    <!-- Header will be injected by header.js -->
 
-    <div class="container">
-        <div class="header">
+    <main class="main-content">
+        <div class="hero-section">
             <h1 data-i18n="company_tools">Công Cụ</h1>
             <p data-i18n="company_tools_subtitle">Bộ công cụ xử lý dữ liệu nội bộ dành cho nhân viên</p>
         </div>
 
-        <div class="tools-grid">
-            <!-- PDF Tools -->
-            <div class="tool-card">
-                <div class="tool-icon">📄</div>
-                <div class="tool-name" data-i18n="tool_pdf">PDF Tools</div>
-                <div class="tool-description" data-i18n="tool_pdf_desc">Tách, nối, chỉnh sửa, nén, bảo mật PDF</div>
-                <a href="/pdf" data-i18n="btn_use_now">Sử dụng</a>
-            </div>
+        <div class="tools-section">
+            <div class="tools-grid">
+                <!-- PDF Tools -->
+                <div class="tool-card">
+                    <span class="tool-icon">📄</span>
+                    <div class="tool-name" data-i18n="tool_pdf">PDF Tools</div>
+                    <div class="tool-description" data-i18n="tool_pdf_desc">Tách, nối, chỉnh sửa, nén, bảo mật PDF</div>
+                    <a href="/pdf" data-i18n="btn_use_now">Sử dụng</a>
+                </div>
 
-            <!-- Image Converter -->
-            <div class="tool-card">
-                <div class="tool-icon">🖼️</div>
-                <div class="tool-name" data-i18n="tool_image">Chuyển đổi ảnh</div>
-                <div class="tool-description" data-i18n="tool_image_desc">Chuyển đổi, nén, thay đổi kích thước ảnh</div>
-                <a href="/image-converter" data-i18n="btn_use_now">Sử dụng</a>
-            </div>
+                <!-- Image Converter -->
+                <div class="tool-card">
+                    <span class="tool-icon">🖼️</span>
+                    <div class="tool-name" data-i18n="tool_image">Chuyển đổi ảnh</div>
+                    <div class="tool-description" data-i18n="tool_image_desc">Chuyển đổi, nén, thay đổi kích thước ảnh</div>
+                    <a href="/image-converter" data-i18n="btn_use_now">Sử dụng</a>
+                </div>
 
-            <!-- Password Generator -->
-            <div class="tool-card">
-                <div class="tool-icon">🔐</div>
-                <div class="tool-name" data-i18n="tool_password">Tạo Mật Khẩu</div>
-                <div class="tool-description" data-i18n="tool_password_desc">Tạo mật khẩu ngẫu nhiên mạnh với tùy chỉnh</div>
-                <a href="/password-generator" data-i18n="btn_use_now">Sử dụng</a>
-            </div>
+                <!-- Password Generator -->
+                <div class="tool-card">
+                    <span class="tool-icon">🔐</span>
+                    <div class="tool-name" data-i18n="tool_password">Tạo Mật Khẩu</div>
+                    <div class="tool-description" data-i18n="tool_password_desc">Tạo mật khẩu ngẫu nhiên mạnh với tùy chỉnh</div>
+                    <a href="/password-generator" data-i18n="btn_use_now">Sử dụng</a>
+                </div>
 
-            <!-- Word Comparison -->
-            <div class="tool-card">
-                <div class="tool-icon">📝</div>
-                <div class="tool-name" data-i18n="tool_word_compare">So Sánh Word</div>
-                <div class="tool-description" data-i18n="tool_word_compare_desc">So sánh 2 file Word (.docx) và highlight sự khác biệt</div>
-                <a href="/word-compare" data-i18n="btn_use_now">Sử dụng</a>
-            </div>
+                <!-- Word Comparison -->
+                <div class="tool-card">
+                    <span class="tool-icon">📝</span>
+                    <div class="tool-name" data-i18n="tool_word_compare">So Sánh Word</div>
+                    <div class="tool-description" data-i18n="tool_word_compare_desc">So sánh 2 file Word (.docx) và highlight sự khác biệt</div>
+                    <a href="/word-compare" data-i18n="btn_use_now">Sử dụng</a>
+                </div>
 
-            <!-- Excel Comparison -->
-            <div class="tool-card">
-                <div class="tool-icon">📊</div>
-                <div class="tool-name" data-i18n="tool_excel_compare">So Sánh Excel</div>
-                <div class="tool-description" data-i18n="tool_excel_compare_desc">So sánh 2 file Excel (.xlsx) và highlight dữ liệu thay đổi</div>
-                <a href="/excel-compare" data-i18n="btn_use_now">Sử dụng</a>
-            </div>
+                <!-- Excel Comparison -->
+                <div class="tool-card">
+                    <span class="tool-icon">📊</span>
+                    <div class="tool-name" data-i18n="tool_excel_compare">So Sánh Excel</div>
+                    <div class="tool-description" data-i18n="tool_excel_compare_desc">So sánh 2 file Excel (.xlsx) và highlight dữ liệu thay đổi</div>
+                    <a href="/excel-compare" data-i18n="btn_use_now">Sử dụng</a>
+                </div>
 
-            <!-- OCR Scanner -->
-            <div class="tool-card coming-soon">
-                <div class="tool-icon">📸</div>
-                <div class="tool-name" data-i18n="ocr_title">Quét OCR</div>
-                <div class="tool-description" data-i18n="ocr_desc">Nhận dạng text từ ảnh, chuyển đổi ảnh thành văn bản</div>
-                <span class="coming-soon-badge" data-i18n="coming_soon">Sắp ra mắt</span>
+                <!-- OCR Scanner -->
+                <div class="tool-card coming-soon">
+                    <span class="tool-icon">📸</span>
+                    <div class="tool-name" data-i18n="ocr_title">Quét OCR</div>
+                    <div class="tool-description" data-i18n="ocr_desc">Nhận dạng text từ ảnh, chuyển đổi ảnh thành văn bản</div>
+                    <span class="coming-soon-badge" data-i18n="coming_soon">Sắp ra mắt</span>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 
+    <script src="/static/js/footer.js?v=2.2"></script>
     <script>
-        // Tự động dọn dẹp file tạm khi người dùng đóng tab
+        // Auto cleanup on tab close
         window.addEventListener("beforeunload", function() {
             navigator.sendBeacon("/api/cleanup");
         });
     </script>
-    <script src="/static/js/footer.js?v=2.2"></script>
 </body>
 </html>
