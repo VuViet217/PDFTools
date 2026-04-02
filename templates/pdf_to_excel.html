@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="pdf_to_excel_title">PDF sang Excel</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.8">
+    <script src="/static/js/i18n.js?v=3.4"></script>
+    <script src="/static/js/header.js?v=1.6"></script>
+    <style>
+        .main-content { flex: 1; padding: 40px; background: #f8f9fa; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .page-title { font-size: 28px; font-weight: 700; margin-bottom: 24px; color: #333; display: flex; align-items: center; gap: 12px; }
+        .page-title-icon { font-size: 32px; }
+
+        .card { background: white; border-radius: 12px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 24px; }
+
+        .upload-area {
+            border: 2px dashed #667eea; border-radius: 8px; padding: 30px;
+            text-align: center; cursor: pointer; transition: all 0.2s; background: #f8f9ff;
+        }
+        .upload-area:hover { border-color: #764ba2; background: #f0f2ff; }
+        .upload-area.dragover { border-color: #764ba2; background: #e8ebff; }
+        .upload-area p { margin: 0 0 8px; color: #667eea; font-weight: 600; font-size: 15px; }
+        .upload-area small { color: #888; font-size: 13px; }
+        .upload-area input[type="file"] { display: none; }
+
+        .warning-box {
+            background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;
+            padding: 12px 16px; margin-top: 16px; font-size: 13px; color: #856404;
+        }
+        .warning-box strong { font-weight: 600; }
+
+        .file-info {
+            display: none; margin: 16px 0; padding: 12px 16px;
+            background: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 4px;
+            color: #2e7d32; font-size: 14px;
+        }
+        .file-info.show { display: block; }
+
+        .btn-group { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-primary, .btn-secondary {
+            flex: 1; padding: 13px 20px; border: none; border-radius: 8px;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.3); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-secondary:hover { background: #e0e0e0; }
+
+        .progress-section {
+            display: none; margin-top: 20px; padding: 16px;
+            background: #f5f5f5; border-radius: 8px; text-align: center;
+        }
+        .progress-section.show { display: block; }
+        .spinner {
+            display: inline-block; width: 20px; height: 20px;
+            border: 3px solid #f3f3f3; border-top: 3px solid #667eea;
+            border-radius: 50%; animation: spin 1s linear infinite;
+            margin-right: 10px; vertical-align: middle;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Preview table */
+        .preview-section { display: none; margin-top: 24px; }
+        .preview-section.show { display: block; }
+        .preview-header { font-weight: 700; font-size: 16px; color: #333; margin-bottom: 12px; }
+        .preview-table-wrap {
+            overflow-x: auto; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 16px;
+        }
+        .preview-label {
+            background: #f0f4ff; padding: 8px 14px; font-weight: 600; font-size: 13px;
+            color: #2F5496; border-bottom: 1px solid #e0e0e0;
+        }
+        .preview-table {
+            width: 100%; border-collapse: collapse; font-size: 13px;
+        }
+        .preview-table th {
+            background: #4472C4; color: white; padding: 8px 10px;
+            text-align: left; font-weight: 600; white-space: nowrap;
+        }
+        .preview-table td {
+            padding: 6px 10px; border-bottom: 1px solid #eee;
+        }
+        .preview-table tr:hover td { background: #f8f9ff; }
+        .preview-more { color: #888; font-style: italic; padding: 8px 14px; font-size: 12px; }
+        .table-count {
+            background: #e8f5e9; border-radius: 6px; padding: 10px 16px;
+            margin-bottom: 16px; font-size: 14px; color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">
+                <span class="page-title-icon">📊</span>
+                <span data-i18n="pdf_to_excel_title">PDF sang Excel</span>
+            </h1>
+
+            <div class="card">
+                <form id="mainForm">
+                    <div class="upload-area" id="uploadArea">
+                        <p data-i18n="pte_drag_drop">📁 Kéo thả file PDF hoặc click để chọn</p>
+                        <small data-i18n="pte_max_size">Tối đa 50MB</small>
+                        <input type="file" id="fileInput" accept=".pdf" required>
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>⚠️</strong> <span data-i18n="pte_scan_warning">File PDF dạng scan (ảnh) có thể không trích xuất được bảng. Chức năng này hoạt động tốt nhất với PDF có bảng dạng text.</span>
+                    </div>
+
+                    <div class="file-info" id="fileInfo">
+                        <strong>📄</strong> <span id="fileName"></span>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn-primary" id="previewBtn" disabled data-i18n="pte_preview_btn">🔍 Xem trước bảng</button>
+                        <button type="button" class="btn-primary" id="downloadBtn" disabled data-i18n="pte_download_btn">📊 Tải Excel</button>
+                        <button type="reset" class="btn-secondary" data-i18n="btn_reset">Xóa</button>
+                    </div>
+                </form>
+
+                <div class="progress-section" id="progressSection">
+                    <span class="spinner"></span>
+                    <span data-i18n="processing">Đang xử lý...</span>
+                </div>
+
+                <!-- Preview -->
+                <div class="preview-section" id="previewSection">
+                    <div class="preview-header" data-i18n="pte_preview_title">📋 Xem trước bảng tìm thấy</div>
+                    <div class="table-count" id="tableCount"></div>
+                    <div id="previewContent"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="/static/js/footer.js?v=2.5"></script>
+
+    <script>
+        function getCurrentLang() {
+            return localStorage.getItem('language') || localStorage.getItem('lang') || 'vi';
+        }
+
+        function showToast(msg, type = "info") {
+            const c = document.getElementById("toastContainer");
+            const t = document.createElement("div");
+            t.className = `toast ${type}`;
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => { t.classList.add("remove"); setTimeout(() => t.remove(), 300); }, 4000);
+        }
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const previewBtn = document.getElementById('previewBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const progressSection = document.getElementById('progressSection');
+        const previewSection = document.getElementById('previewSection');
+        const previewContent = document.getElementById('previewContent');
+        const tableCount = document.getElementById('tableCount');
+        const mainForm = document.getElementById('mainForm');
+
+        // Upload area
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault(); uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) { fileInput.files = e.dataTransfer.files; fileInput.dispatchEvent(new Event('change')); }
+        });
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                fileName.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+                fileInfo.classList.add('show');
+                previewBtn.disabled = false;
+                downloadBtn.disabled = false;
+                previewSection.classList.remove('show');
+            }
+        });
+
+        mainForm.addEventListener('reset', () => {
+            fileInfo.classList.remove('show');
+            previewSection.classList.remove('show');
+            previewBtn.disabled = true;
+            downloadBtn.disabled = true;
+        });
+
+        // Preview
+        previewBtn.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            progressSection.classList.add('show');
+            previewBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const resp = await fetch('/api/pdf-to-excel/preview', { method: 'POST', body: formData });
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    throw new Error(err.detail || 'Error');
+                }
+
+                const data = await resp.json();
+                renderPreview(data);
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                progressSection.classList.remove('show');
+                previewBtn.disabled = false;
+            }
+        });
+
+        function renderPreview(data) {
+            const lang = getCurrentLang();
+            const msgs = {
+                vi: { found: `Tìm thấy ${data.total_tables} bảng`, none: 'Không tìm thấy bảng nào trong file PDF', more: 'dòng nữa...' },
+                ja: { found: `${data.total_tables} 個のテーブルが見つかりました`, none: 'PDFにテーブルが見つかりませんでした', more: '行が続きます...' }
+            };
+            const m = msgs[lang] || msgs.vi;
+
+            if (data.total_tables === 0) {
+                tableCount.textContent = '⚠️ ' + m.none;
+                tableCount.style.background = '#fff3cd';
+                tableCount.style.color = '#856404';
+                previewContent.innerHTML = '';
+                previewSection.classList.add('show');
+                return;
+            }
+
+            tableCount.textContent = '✅ ' + m.found;
+            tableCount.style.background = '#e8f5e9';
+            tableCount.style.color = '#2e7d32';
+
+            let html = '';
+            for (const tbl of data.tables) {
+                html += `<div class="preview-table-wrap">`;
+                html += `<div class="preview-label">📄 Page ${tbl.page} - Table ${tbl.table_index + 1} (${tbl.rows} rows × ${tbl.cols} cols)</div>`;
+                html += `<table class="preview-table">`;
+
+                for (let i = 0; i < tbl.preview.length; i++) {
+                    const row = tbl.preview[i];
+                    if (i === 0) {
+                        html += '<tr>' + row.map(c => `<th>${escapeHtml(c)}</th>`).join('') + '</tr>';
+                    } else {
+                        html += '<tr>' + row.map(c => `<td>${escapeHtml(c)}</td>`).join('') + '</tr>';
+                    }
+                }
+
+                html += '</table>';
+                if (tbl.rows > 5) {
+                    html += `<div class="preview-more">... +${tbl.rows - 5} ${m.more}</div>`;
+                }
+                html += '</div>';
+            }
+
+            previewContent.innerHTML = html;
+            previewSection.classList.add('show');
+        }
+
+        // Download
+        downloadBtn.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            progressSection.classList.add('show');
+            downloadBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const resp = await fetch('/api/pdf-to-excel', { method: 'POST', body: formData });
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    throw new Error(err.detail || 'Error');
+                }
+
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name.replace('.pdf', '_tables.xlsx');
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(url);
+                a.remove();
+
+                showToast(t('pte_success') || 'Tải xuống thành công!', 'success');
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                progressSection.classList.remove('show');
+                downloadBtn.disabled = false;
+            }
+        });
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // i18n
+        function waitAndApply() {
+            if (typeof applyLang === 'function' && typeof TRANSLATIONS !== 'undefined') {
+                applyLang();
+            } else {
+                setTimeout(waitAndApply, 50);
+            }
+        }
+        waitAndApply();
+
+        window.addEventListener("beforeunload", () => navigator.sendBeacon("/api/cleanup"));
+    </script>
+</body>
+</html>

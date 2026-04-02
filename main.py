@@ -20,6 +20,7 @@ from routers.image_converter import router as image_converter_router
 from routers.word_compare import router as word_compare_router
 from routers.excel_compare import router as excel_compare_router
 from routers.pdf_to_image import router as pdf_to_image_router
+from routers.pdf_to_excel import router as pdf_to_excel_router
 
 # Import services
 from services.visitor_tracker import visitor_tracker
@@ -165,6 +166,7 @@ app.include_router(image_converter_router, prefix="/api", tags=["image_converter
 app.include_router(word_compare_router, prefix="/api", tags=["word_compare"])
 app.include_router(excel_compare_router, prefix="/api", tags=["excel_compare"])
 app.include_router(pdf_to_image_router, prefix="/api", tags=["pdf_to_image"])
+app.include_router(pdf_to_excel_router, prefix="/api", tags=["pdf_to_excel"])
 
 # Root route - serve tools.html (main dashboard)
 @app.get("/", response_class=HTMLResponse)
@@ -236,6 +238,12 @@ async def excel_compare_page():
 @app.get("/extract-pages", response_class=HTMLResponse)
 async def extract_pages_page():
     with open("templates/extract_pages.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# PDF to Excel page
+@app.get("/pdf-to-excel", response_class=HTMLResponse)
+async def pdf_to_excel_page():
+    with open("templates/pdf_to_excel.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Manual cleanup endpoint - người dùng có thể gọi khi kết thúc session

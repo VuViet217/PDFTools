@@ -211,6 +211,17 @@ const TRANSLATIONS = {
     pdf_to_image_success: "Chuyển đổi thành công!",
     pdf_to_image_images: "ảnh",
 
+    // PDF to Excel
+    pdf_to_excel_title: "PDF sang Excel",
+    pdf_to_excel_desc: "Xuất bảng trong PDF ra file Excel để dễ copy dữ liệu",
+    pte_drag_drop: "📁 Kéo thả file PDF hoặc click để chọn",
+    pte_max_size: "Tối đa 50MB",
+    pte_scan_warning: "File PDF dạng scan (ảnh) có thể không trích xuất được bảng. Chức năng này hoạt động tốt nhất với PDF có bảng dạng text.",
+    pte_preview_btn: "🔍 Xem trước bảng",
+    pte_download_btn: "📊 Tải Excel",
+    pte_preview_title: "📋 Xem trước bảng tìm thấy",
+    pte_success: "Tải xuống thành công!",
+
     // Footer
     footer_brand: "Được phát triển bởi <strong>Việt Đinh - IT OVNC</strong> • Hệ thống nội bộ — Chỉ dành cho nhân viên công ty",
     footer_online: "Online",
@@ -429,6 +440,17 @@ const TRANSLATIONS = {
     btn_pdf_to_image: "🖼️ 変換",
     pdf_to_image_success: "変換に成功しました！",
     pdf_to_image_images: "画像",
+
+    // PDF to Excel
+    pdf_to_excel_title: "PDFをExcelに変換",
+    pdf_to_excel_desc: "PDF内の表をExcelファイルに出力してデータを簡単にコピー",
+    pte_drag_drop: "📁 PDFファイルをドラッグ＆ドロップまたはクリックして選択",
+    pte_max_size: "最大50MB",
+    pte_scan_warning: "スキャンされたPDF（画像）は表を抽出できない場合があります。この機能はテキストベースの表を含むPDFで最適に動作します。",
+    pte_preview_btn: "🔍 表をプレビュー",
+    pte_download_btn: "📊 Excelダウンロード",
+    pte_preview_title: "📋 検出された表のプレビュー",
+    pte_success: "ダウンロード成功！",
 
     // Footer
     footer_brand: "<strong>Việt Đinh - IT OVNC</strong> が開発 • 社内システム — 社員専用",
