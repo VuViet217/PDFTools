@@ -114,7 +114,8 @@ async def get_pdf_info(file: UploadFile = File(...)):
 async def extract_pages_endpoint(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    page_range: str = Form("")
+    page_range: str = Form(""),
+    lang: str = Form("en")
 ):
     """
     API endpoint tách/trích xuất các trang cụ thể từ PDF
@@ -123,6 +124,7 @@ async def extract_pages_endpoint(
     Request:
         - file: PDF upload
         - page_range: Danh sách trang (VD: "1,2,5-10")
+        - lang: Ngôn ngữ (vi, ja, en) - mặc định: en
     
     Response:
         - File: PDF chỉ chứa các trang đã chọn
@@ -142,8 +144,8 @@ async def extract_pages_endpoint(
             raise HTTPException(status_code=413, detail="File quá lớn (max 50MB)")
         
         try:
-            # Gọi service extract pages (xử lý hoàn toàn trong memory)
-            output_pdf = extract_pages(contents, page_range.strip())
+            # Gọi service extract pages (xử lý hoàn toàn trong memory) với ngôn ngữ
+            output_pdf = extract_pages(contents, page_range.strip(), lang)
             
             # Tạo file tạm để trả về
             with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False, dir=UPLOADS_DIR) as tmp:
@@ -162,9 +164,9 @@ async def extract_pages_endpoint(
         
         except ValueError as e:
             # Lỗi từ page range parsing
-            raise HTTPException(status_code=400, detail=f"Lỗi danh sách trang: {str(e)}")
+            raise HTTPException(status_code=400, detail=str(e))
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Lỗi xử lý PDF: {str(e)}")
+            raise HTTPException(status_code=400, detail=str(e))
     
     except HTTPException:
         raise
