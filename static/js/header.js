@@ -45,6 +45,7 @@ function createHeader() {
               <a href="/security" class="dropdown-item" data-i18n="nav_security">Bảo mật</a>
               <a href="/pdf-to-image" class="dropdown-item" data-i18n="pdf_to_image_title">Chuyển đổi PDF sang Ảnh</a>
               <a href="/pdf-to-excel" class="dropdown-item" data-i18n="pdf_to_excel_title">PDF sang Excel</a>
+              <a href="/annotate" class="dropdown-item" data-i18n="annotate_title">Annotate PDF</a>
             </div>
           </div>
 

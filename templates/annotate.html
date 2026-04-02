@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="annotate_title">Annotate PDF</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.8">
+    <link rel="stylesheet" href="/static/css/annotate.css?v=1.1">
+    <script src="/static/js/i18n.js?v=3.6"></script>
+    <script src="/static/js/header.js?v=1.7"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+</head>
+<body>
+    <div class="annotate-app">
+        <!-- Upload Screen -->
+        <div id="uploadScreen" class="upload-screen">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📝</div>
+                <h2 data-i18n="annotate_title">Annotate PDF</h2>
+                <p data-i18n="annotate_drag_drop">Kéo thả file PDF hoặc click để chọn</p>
+                <p class="upload-hint" data-i18n="annotate_max_size">Tối đa 100MB</p>
+                <input type="file" id="fileInput" accept=".pdf" hidden>
+            </div>
+        </div>
+
+        <!-- Editor Screen -->
+        <div id="editorScreen" class="editor-screen" style="display:none;">
+            <!-- Top Toolbar -->
+            <div class="annotate-toolbar">
+                <div class="toolbar-left">
+                    <button class="tool-btn" id="btnBack" title="Back">
+                        <span>← </span><span data-i18n="annotate_back">Quay lại</span>
+                    </button>
+                    <span class="toolbar-divider"></span>
+                    <button class="tool-btn" id="btnUndo" title="Undo" disabled>↩</button>
+                    <button class="tool-btn" id="btnRedo" title="Redo" disabled>↪</button>
+                </div>
+
+                <div class="toolbar-center">
+                    <button class="tool-btn tool-select active" id="btnSelect" data-tool="select" title="Select">
+                        <span>🖱</span>
+                    </button>
+                    <span class="toolbar-divider"></span>
+                    <button class="tool-btn" id="btnAddText" data-tool="text" title="Add Text">
+                        <span>✏️</span> <span class="tool-label" data-i18n="annotate_text">Thêm chữ</span>
+                    </button>
+                    <button class="tool-btn" id="btnHighlight" data-tool="highlight" title="Highlight">
+                        <span>🟨</span> <span class="tool-label" data-i18n="annotate_highlight">Highlight</span>
+                    </button>
+                    <button class="tool-btn" id="btnDraw" data-tool="draw" title="Draw">
+                        <span>✍️</span> <span class="tool-label" data-i18n="annotate_draw">Vẽ</span>
+                    </button>
+                    <button class="tool-btn" id="btnEraser" data-tool="eraser" title="Eraser">
+                        <span>🧹</span> <span class="tool-label" data-i18n="annotate_eraser">Tẩy</span>
+                    </button>
+                    <span class="toolbar-divider"></span>
+                    <!-- Shapes dropdown -->
+                    <div class="tool-dropdown">
+                        <button class="tool-btn" id="btnShapes" data-tool="shapes" title="Shapes">
+                            <span>⬜</span> <span class="tool-label" data-i18n="annotate_shapes">Hình</span>
+                            <span class="dropdown-arrow">▾</span>
+                        </button>
+                        <div class="tool-dropdown-menu" id="shapesMenu">
+                            <button class="dropdown-shape-item" data-shape="rectangle">
+                                <span>▭</span> <span data-i18n="annotate_rectangle">Hình chữ nhật</span>
+                            </button>
+                            <button class="dropdown-shape-item" data-shape="ellipse">
+                                <span>⬭</span> <span data-i18n="annotate_ellipse">Hình elip</span>
+                            </button>
+                            <button class="dropdown-shape-item" data-shape="line">
+                                <span>╱</span> <span data-i18n="annotate_line">Đường thẳng</span>
+                            </button>
+                            <button class="dropdown-shape-item" data-shape="arrow">
+                                <span>→</span> <span data-i18n="annotate_arrow">Mũi tên</span>
+                            </button>
+                            <button class="dropdown-shape-item" data-shape="polygon">
+                                <span>⬠</span> <span data-i18n="annotate_polygon">Đa giác</span>
+                            </button>
+                            <button class="dropdown-shape-item" data-shape="polyline">
+                                <span>⟋</span> <span data-i18n="annotate_polyline">Đường gấp khúc</span>
+                            </button>
+                        </div>
+                    </div>
+                    <span class="toolbar-divider"></span>
+                    <button class="tool-btn" id="btnSign" data-tool="sign" title="Signature">
+                        <span>🖊</span> <span class="tool-label" data-i18n="annotate_sign">Ký tên</span>
+                    </button>
+                    <button class="tool-btn" id="btnImage" data-tool="image" title="Insert Image">
+                        <span>🖼</span> <span class="tool-label" data-i18n="annotate_image">Ảnh</span>
+                    </button>
+                    <span class="toolbar-divider"></span>
+                    <button class="tool-btn tool-danger" id="btnDelete" title="Delete selected">
+                        <span>🗑</span>
+                    </button>
+                </div>
+
+                <div class="toolbar-right">
+                    <button class="tool-btn tool-primary" id="btnSave">
+                        <span>💾</span> <span data-i18n="annotate_save">Lưu PDF</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tool Options Bar -->
+            <div class="tool-options-bar" id="toolOptionsBar" style="display:none;">
+                <!-- Text options -->
+                <div class="option-group" id="textOptions" style="display:none;">
+                    <label data-i18n="annotate_font_size">Cỡ chữ:</label>
+                    <input type="number" id="optFontSize" value="16" min="8" max="72" class="opt-input">
+                    <label data-i18n="annotate_color">Màu:</label>
+                    <input type="color" id="optTextColor" value="#000000" class="opt-color">
+                </div>
+                <!-- Highlight options -->
+                <div class="option-group" id="highlightOptions" style="display:none;">
+                    <label data-i18n="annotate_color">Màu:</label>
+                    <input type="color" id="optHighlightColor" value="#FFFF00" class="opt-color">
+                    <label data-i18n="annotate_opacity">Độ mờ:</label>
+                    <input type="range" id="optHighlightOpacity" min="10" max="80" value="35" class="opt-range">
+                </div>
+                <!-- Draw options -->
+                <div class="option-group" id="drawOptions" style="display:none;">
+                    <label data-i18n="annotate_color">Màu:</label>
+                    <input type="color" id="optDrawColor" value="#000000" class="opt-color">
+                    <label data-i18n="annotate_stroke_width">Độ dày:</label>
+                    <input type="range" id="optDrawWidth" min="1" max="20" value="3" class="opt-range">
+                    <span id="drawWidthVal">3px</span>
+                </div>
+                <!-- Eraser options -->
+                <div class="option-group" id="eraserOptions" style="display:none;">
+                    <label data-i18n="annotate_eraser_size">Kích thước tẩy:</label>
+                    <input type="range" id="optEraserSize" min="5" max="60" value="20" class="opt-range">
+                    <span id="eraserSizeVal">20px</span>
+                    <span class="opt-hint" data-i18n="annotate_eraser_hint">Click vào đối tượng để xóa</span>
+                </div>
+                <!-- Shape options -->
+                <div class="option-group" id="shapeOptions" style="display:none;">
+                    <label data-i18n="annotate_stroke_color">Viền:</label>
+                    <input type="color" id="optShapeStrokeColor" value="#000000" class="opt-color">
+                    <label data-i18n="annotate_fill_color">Nền:</label>
+                    <input type="color" id="optShapeFillColor" value="#ffffff" class="opt-color">
+                    <label class="opt-checkbox-label">
+                        <input type="checkbox" id="optShapeNoFill" checked>
+                        <span data-i18n="annotate_no_fill">Không nền</span>
+                    </label>
+                    <label data-i18n="annotate_stroke_width">Độ dày:</label>
+                    <select id="optShapeStrokeWidth" class="opt-select">
+                        <option value="1">1 pt</option>
+                        <option value="2">2 pt</option>
+                        <option value="3" selected>3 pt</option>
+                        <option value="5">5 pt</option>
+                        <option value="8">8 pt</option>
+                    </select>
+                    <label data-i18n="annotate_line_style">Nét:</label>
+                    <select id="optShapeLineStyle" class="opt-select">
+                        <option value="solid" data-i18n="annotate_solid">Liền</option>
+                        <option value="dashed" data-i18n="annotate_dashed">Nét đứt</option>
+                        <option value="dotted" data-i18n="annotate_dotted">Chấm</option>
+                    </select>
+                    <label data-i18n="annotate_opacity">Độ mờ:</label>
+                    <input type="range" id="optShapeOpacity" min="10" max="100" value="100" class="opt-range opt-range-short">
+                    <span id="shapeOpacityVal">100%</span>
+                    <!-- Polygon sides -->
+                    <span id="polygonSidesGroup" style="display:none;">
+                        <label data-i18n="annotate_sides">Cạnh:</label>
+                        <input type="number" id="optPolygonSides" value="5" min="3" max="12" class="opt-input opt-input-small">
+                    </span>
+                </div>
+            </div>
+
+            <div class="editor-body">
+                <!-- Thumbnail Sidebar -->
+                <div class="thumbnail-sidebar" id="thumbnailSidebar">
+                    <div class="thumbnails-list" id="thumbnailsList"></div>
+                </div>
+
+                <!-- Main Canvas Area -->
+                <div class="canvas-area" id="canvasArea">
+                    <div class="page-container" id="pageContainer">
+                        <canvas id="fabricCanvas"></canvas>
+                    </div>
+                    <!-- Page Navigation -->
+                    <div class="page-nav">
+                        <button class="nav-btn" id="btnPrevPage">‹</button>
+                        <span>
+                            <span data-i18n="annotate_page">Trang</span>
+                            <input type="number" id="pageNumInput" value="1" min="1" class="page-num-input">
+                            / <span id="totalPages">0</span>
+                        </span>
+                        <button class="nav-btn" id="btnNextPage">›</button>
+                        <span class="toolbar-divider"></span>
+                        <button class="nav-btn" id="btnZoomOut">−</button>
+                        <span id="zoomLevel">100%</span>
+                        <button class="nav-btn" id="btnZoomIn">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signature Modal -->
+        <div class="modal-overlay" id="signModal" style="display:none;">
+            <div class="modal-box">
+                <h3 data-i18n="annotate_sign_title">Tạo chữ ký</h3>
+                <div class="sign-tabs">
+                    <button class="sign-tab active" data-tab="draw" data-i18n="annotate_sign_draw">Vẽ</button>
+                    <button class="sign-tab" data-tab="upload" data-i18n="annotate_sign_upload">Upload ảnh</button>
+                </div>
+                <div class="sign-content">
+                    <div id="signDrawPanel" class="sign-panel">
+                        <canvas id="signCanvas" width="400" height="200"></canvas>
+                        <button class="btn-small" id="btnClearSign" data-i18n="annotate_sign_clear">Xóa</button>
+                    </div>
+                    <div id="signUploadPanel" class="sign-panel" style="display:none;">
+                        <input type="file" id="signFileInput" accept="image/*">
+                        <div class="sign-preview" id="signPreview"></div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" id="btnCancelSign" data-i18n="annotate_cancel">Hủy</button>
+                    <button class="btn-confirm" id="btnConfirmSign" data-i18n="annotate_sign_apply">Áp dụng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/static/js/annotate.js?v=2.0"></script>
+    <script>
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add("show"), 10);
+            setTimeout(() => {
+                toast.classList.remove("show");
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,577 @@
+/* ============ PDF Annotate Styles ============ */
+
+.annotate-app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #1a1a2e;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Upload Screen */
+.upload-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 40px;
+}
+
+.upload-area {
+    border: 3px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 60px 80px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.05);
+    max-width: 500px;
+}
+
+.upload-area:hover,
+.upload-area.drag-over {
+    border-color: #64b5f6;
+    background: rgba(100, 181, 246, 0.1);
+}
+
+.upload-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.upload-area h2 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.upload-area p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 4px 0;
+}
+
+.upload-hint {
+    font-size: 13px !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Editor Screen */
+.editor-screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Toolbar */
+.annotate-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #16213e;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    min-height: 48px;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.toolbar-left,
+.toolbar-center,
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.toolbar-center {
+    gap: 2px;
+}
+
+.tool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: #ccc;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.tool-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.tool-btn.active {
+    background: rgba(100, 181, 246, 0.2);
+    border-color: #64b5f6;
+    color: #64b5f6;
+}
+
+.tool-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tool-btn.tool-danger:hover {
+    background: rgba(239, 83, 80, 0.2);
+    color: #ef5350;
+}
+
+.tool-btn.tool-primary {
+    background: #1976d2;
+    color: #fff;
+    border-color: #1976d2;
+}
+
+.tool-btn.tool-primary:hover {
+    background: #1565c0;
+}
+
+.tool-label {
+    font-size: 12px;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 4px;
+}
+
+/* Tool Options Bar */
+.tool-options-bar {
+    display: flex;
+    align-items: center;
+    background: #1e2a4a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 16px;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.option-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #aaa;
+    font-size: 13px;
+}
+
+.opt-input {
+    width: 60px;
+    padding: 3px 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 13px;
+}
+
+.opt-color {
+    width: 32px;
+    height: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    background: transparent;
+    padding: 2px;
+}
+
+.opt-range {
+    width: 100px;
+    accent-color: #64b5f6;
+}
+
+/* Editor Body */
+.editor-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Thumbnail Sidebar */
+.thumbnail-sidebar {
+    width: 140px;
+    min-width: 140px;
+    background: #0f1629;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.thumbnails-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.thumbnail-item {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    padding: 4px;
+    transition: all 0.15s;
+    text-align: center;
+}
+
+.thumbnail-item:hover {
+    border-color: rgba(100, 181, 246, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.thumbnail-item.active {
+    border-color: #64b5f6;
+    background: rgba(100, 181, 246, 0.1);
+}
+
+.thumb-canvas-wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.thumb-canvas-wrap canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 3px;
+}
+
+.thumb-label {
+    display: block;
+    color: #999;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.thumbnail-item.active .thumb-label {
+    color: #64b5f6;
+    font-weight: 600;
+}
+
+/* Canvas Area */
+.canvas-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #2a2a3e;
+}
+
+.page-container {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.page-container canvas {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Page Navigation */
+.page-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #16213e;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.nav-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    background: transparent;
+    color: #ccc;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.page-num-input {
+    width: 48px;
+    text-align: center;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 13px;
+}
+
+/* Signature Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    background: #1e2a4a;
+    border-radius: 12px;
+    padding: 24px;
+    width: 460px;
+    max-width: 90vw;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modal-box h3 {
+    color: #fff;
+    margin: 0 0 16px 0;
+    font-size: 18px;
+}
+
+.sign-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.sign-tab {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+}
+
+.sign-tab.active {
+    background: rgba(100, 181, 246, 0.2);
+    border-color: #64b5f6;
+    color: #64b5f6;
+}
+
+.sign-panel {
+    text-align: center;
+}
+
+#signCanvas {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    cursor: crosshair;
+    width: 100%;
+    height: auto;
+    background: #fff;
+}
+
+.sign-preview {
+    min-height: 80px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.btn-small {
+    margin-top: 8px;
+    padding: 4px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background: transparent;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-small:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.btn-cancel,
+.btn-confirm {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+}
+
+.btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-confirm {
+    background: #1976d2;
+    color: #fff;
+}
+
+.btn-confirm:hover {
+    background: #1565c0;
+}
+
+/* Toast overrides for annotate page */
+.annotate-app .toast-container {
+    position: fixed;
+    top: 60px;
+    right: 16px;
+    z-index: 9999;
+}
+
+/* Scrollbar styling */
+.thumbnail-sidebar::-webkit-scrollbar,
+.page-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.thumbnail-sidebar::-webkit-scrollbar-thumb,
+.page-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.thumbnail-sidebar::-webkit-scrollbar-track,
+.page-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* File input in sign modal */
+#signFileInput {
+    color: #ccc;
+    font-size: 13px;
+}
+
+/* Shapes Dropdown */
+.tool-dropdown {
+    position: relative;
+    display: inline-flex;
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    margin-left: 2px;
+    opacity: 0.6;
+}
+
+.tool-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #1e2a4a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 4px;
+    min-width: 180px;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    margin-top: 2px;
+}
+
+.tool-dropdown-menu.show {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dropdown-shape-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: #ccc;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.12s;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.dropdown-shape-item:hover {
+    background: rgba(100, 181, 246, 0.15);
+    color: #fff;
+}
+
+/* Shape option controls */
+.opt-select {
+    padding: 3px 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.opt-select option {
+    background: #1e2a4a;
+    color: #fff;
+}
+
+.opt-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.opt-checkbox-label input[type="checkbox"] {
+    accent-color: #64b5f6;
+}
+
+.opt-hint {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+    margin-left: 8px;
+}
+
+.opt-range-short {
+    width: 70px;
+}
+
+.opt-input-small {
+    width: 44px;
+}
