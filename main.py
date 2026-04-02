@@ -262,9 +262,13 @@ async def get_visitor_stats():
 # Client IP endpoint
 @app.get("/api/client-ip")
 async def get_client_ip(request: Request):
-    """Lấy IP LAN của máy tính (server)"""
-    # Lấy IP LAN của máy chủ, không phải IP của client request
-    ip = get_local_ip()
+    """Lấy IP LAN của người truy cập"""
+    # Ưu tiên header X-Forwarded-For (nếu qua proxy/reverse proxy)
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        ip = forwarded.split(",")[0].strip()
+    else:
+        ip = request.client.host if request.client else "unknown"
     return {"ip": ip}
 
 # Health check
