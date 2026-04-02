@@ -191,15 +191,15 @@ h3 {
 
 .feature-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.2rem;
+    margin-top: 1.5rem;
 }
 
 .feature-card {
     background: white;
     border-radius: 8px;
-    padding: 2rem;
+    padding: 1.2rem 1rem;
     box-shadow: var(--shadow);
     transition: all 0.3s;
     cursor: pointer;
@@ -209,22 +209,25 @@ h3 {
 }
 
 .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }
 
 .feature-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 .feature-card h3 {
     color: var(--primary-color);
+    font-size: 0.95rem;
 }
 
 .feature-card p {
     color: var(--text-light);
-    margin-top: 0.5rem;
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
 }
 
 .feature-card--coming-soon {
@@ -1062,7 +1065,7 @@ h3 {
     }
 
     .feature-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .button-group {
