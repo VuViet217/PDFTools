@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="nav_editor">Chỉnh sửa PDF</title>
     <link rel="stylesheet" href="/static/css/style.css?v=2.3">
-    <script src="/static/js/i18n.js?v=3.2"></script>
+    <script src="/static/js/i18n.js?v=3.3"></script>
     <script src="/static/js/header.js?v=1.5"></script>
 </head>
 <body>
@@ -53,6 +53,7 @@
                 <div class="editor-toolbar">
                     <button id="selectAllBtn" class="btn btn-small" data-i18n="select_all">Chọn tất cả</button>
                     <button id="deselectAllBtn" class="btn btn-small" data-i18n="deselect_all">Bỏ chọn tất cả</button>
+                    <button id="selectBlankBtn" class="btn btn-small" data-i18n="select_blank_pages">📄 Chọn trang trắng</button>
                     <button id="rotateBtn" class="btn btn-small" data-i18n="btn_rotate">Xoay 90°</button>
                     <button id="deleteBlankBtn" class="btn btn-small" data-i18n="btn_delete_blank">🗑 Xoá trang trắng</button>
                     <button id="reverseBtn" class="btn btn-small" data-i18n="btn_reverse">↕ Đảo thứ tự</button>
@@ -138,7 +139,7 @@
         window.addEventListener("beforeunload", function() {
             navigator.sendBeacon("/api/cleanup");
         });    </script>
-    <script src="/static/js/editor.js?v=1.3"></script>
+    <script src="/static/js/editor.js?v=1.4"></script>
     <script src="/static/js/footer.js?v=2.5"></script>
 </body>
 </html>

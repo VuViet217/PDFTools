@@ -389,6 +389,74 @@ async def apply_operations(session_id: str, operations: list, watermark_text: st
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+async def detect_blank_pages(session_id: str, threshold: float = 0.02) -> dict:
+    """
+    Phát hiện các trang trắng trong PDF.
+    Trang trắng = trang có rất ít hoặc không có nội dung (text + hình ảnh).
+    
+    Args:
+        session_id: ID session
+        threshold: Ngưỡng pixel tối (0.0 - 1.0). Trang có tỷ lệ pixel tối < threshold được coi là trắng.
+    
+    Returns:
+        dict với blank_pages: list[int] (1-based page numbers)
+    """
+    try:
+        if session_id not in SESSIONS:
+            return {"success": False, "error": "Session không tồn tại"}
+        
+        session = SESSIONS[session_id]
+        pdf_path = session["pdf_path"]
+        
+        # Nếu file gốc đã bị xóa, dùng pdf_data trong RAM
+        if not os.path.exists(pdf_path):
+            tmp_fd, tmp_path = None, None
+            import tempfile
+            tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
+            with os.fdopen(tmp_fd, 'wb') as f:
+                f.write(session["pdf_data"])
+            pdf_path = tmp_path
+        else:
+            tmp_path = None
+        
+        blank_pages = []
+        import numpy as np
+        
+        # Cũng check text content bằng pypdf
+        pdf_reader = PdfReader(io.BytesIO(session["pdf_data"]))
+        
+        try:
+            with pdfium.PdfDocument(pdf_path) as pdf:
+                for page_idx in range(len(pdf)):
+                    # Check 1: Text content
+                    text = ""
+                    try:
+                        text = pdf_reader.pages[page_idx].extract_text() or ""
+                        text = text.strip()
+                    except:
+                        pass
+                    
+                    # Check 2: Pixel analysis  
+                    page = pdf.get_page(page_idx)
+                    pil_img = page.render(scale=0.3).to_pil().convert("L")  # Grayscale, scale nhỏ hơn cho nhanh
+                    
+                    pixels = np.array(pil_img)
+                    # Tỷ lệ pixel "tối" (< 245) so với tổng pixel
+                    dark_ratio = np.sum(pixels < 245) / pixels.size
+                    
+                    # Trang trắng = không có text VÀ rất ít pixel tối
+                    if len(text) < 5 and dark_ratio < threshold:
+                        blank_pages.append(page_idx + 1)  # 1-based
+                        print(f"  Blank page detected: {page_idx + 1} (text={len(text)}, dark_ratio={dark_ratio:.4f})")
+        finally:
+            if tmp_path and os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+        
+        return {"success": True, "blank_pages": blank_pages}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 def get_session(session_id: str):
     """Lấy session info"""
     return SESSIONS.get(session_id)

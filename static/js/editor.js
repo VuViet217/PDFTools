@@ -17,6 +17,7 @@ const editorMain = document.getElementById("editorMain");
 const editorThumbnails = document.getElementById("editorThumbnails");
 const selectAllBtn = document.getElementById("selectAllBtn");
 const deselectAllBtn = document.getElementById("deselectAllBtn");
+const selectBlankBtn = document.getElementById("selectBlankBtn");
 const rotateBtn = document.getElementById("rotateBtn");
 const deleteBlankBtn = document.getElementById("deleteBlankBtn");
 const reverseBtn = document.getElementById("reverseBtn");
@@ -593,6 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Buttons
     const btnSelectAll = document.getElementById("selectAllBtn");
     const btnDeselectAll = document.getElementById("deselectAllBtn");
+    const btnSelectBlank = document.getElementById("selectBlankBtn");
     const btnRotate = document.getElementById("rotateBtn");
     const btnReverse = document.getElementById("reverseBtn");
     const btnBulkDelete = document.getElementById("bulkDeleteBtn");
@@ -702,9 +704,99 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    if (btnDeleteBlank) btnDeleteBlank.addEventListener("click", () => {
-        addOperation({ type: "delete_blank" });
-        showToast(t("toast_process_ok") || "Ghi nhận lệnh xoá trang trắng", "info");
+    // Select Blank Pages - gọi API detect rồi chọn
+    if (btnSelectBlank) btnSelectBlank.addEventListener("click", async () => {
+        if (!sessionId) {
+            showToast(t("toast_no_file") || "Chưa có file PDF", "error");
+            return;
+        }
+
+        btnSelectBlank.disabled = true;
+        btnSelectBlank.textContent = t("processing") || "Đang xử lý...";
+
+        try {
+            const formData = new FormData();
+            formData.append("session_id", sessionId);
+            const response = await fetch("/api/editor/detect-blank", {
+                method: "POST",
+                body: formData
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Lỗi phát hiện trang trắng");
+            }
+            const data = await response.json();
+            const blankPages = data.blank_pages || [];
+
+            // Chỉ chọn những trang trắng còn trong pageOrder
+            const validBlanks = blankPages.filter(p => pageOrder.includes(p));
+
+            if (validBlanks.length === 0) {
+                showToast(t("no_blank_pages") || "Không tìm thấy trang trắng", "info");
+            } else {
+                selectedPages.clear();
+                validBlanks.forEach(p => selectedPages.add(p));
+                renderThumbnails();
+                showToast(
+                    (t("blank_pages_selected") || "Đã chọn {count} trang trắng").replace("{count}", validBlanks.length),
+                    "success"
+                );
+            }
+        } catch (error) {
+            console.error("Error detecting blank pages:", error);
+            showToast(error.message || "Lỗi phát hiện trang trắng", "error");
+        } finally {
+            btnSelectBlank.disabled = false;
+            btnSelectBlank.textContent = t("select_blank_pages") || "📄 Chọn trang trắng";
+        }
+    });
+
+    // Delete Blank Pages - detect + chọn + xóa luôn
+    if (btnDeleteBlank) btnDeleteBlank.addEventListener("click", async () => {
+        if (!sessionId) {
+            showToast(t("toast_no_file") || "Chưa có file PDF", "error");
+            return;
+        }
+
+        btnDeleteBlank.disabled = true;
+        btnDeleteBlank.textContent = t("processing") || "Đang xử lý...";
+
+        try {
+            const formData = new FormData();
+            formData.append("session_id", sessionId);
+            const response = await fetch("/api/editor/detect-blank", {
+                method: "POST",
+                body: formData
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Lỗi phát hiện trang trắng");
+            }
+            const data = await response.json();
+            const blankPages = data.blank_pages || [];
+            const validBlanks = blankPages.filter(p => pageOrder.includes(p));
+
+            if (validBlanks.length === 0) {
+                showToast(t("no_blank_pages") || "Không tìm thấy trang trắng", "info");
+            } else if (confirm((t("confirm_delete_blank") || "Tìm thấy {count} trang trắng. Bạn có muốn xóa?").replace("{count}", validBlanks.length))) {
+                validBlanks.forEach(pageNum => {
+                    addOperation({ type: "delete", page: pageNum });
+                    pageOrder = pageOrder.filter(p => p !== pageNum);
+                });
+                selectedPages.clear();
+                renderThumbnails();
+                showToast(
+                    (t("blank_pages_deleted") || "Đã xóa {count} trang trắng").replace("{count}", validBlanks.length),
+                    "success"
+                );
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            showToast(error.message || "Lỗi xử lý", "error");
+        } finally {
+            btnDeleteBlank.disabled = false;
+            btnDeleteBlank.textContent = t("btn_delete_blank") || "🗑 Xoá trang trắng";
+        }
     });
 
     if (btnExport) btnExport.addEventListener("click", async () => {
