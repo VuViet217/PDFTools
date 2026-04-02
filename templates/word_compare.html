@@ -228,6 +228,34 @@
             color: var(--text-dark);
         }
 
+        /* Inline character-level diff highlights */
+        .inline-removed {
+            background: #ff9999;
+            color: #721c24;
+            border-radius: 2px;
+        }
+
+        .inline-added {
+            background: #77dd77;
+            color: #155724;
+            border-radius: 2px;
+        }
+
+        .space-marker {
+            background: #ffcc00;
+            border-radius: 2px;
+            min-width: 0.5em;
+            display: inline-block;
+        }
+
+        .space-marker.inline-removed {
+            background: #ff6666;
+        }
+
+        .space-marker.inline-added {
+            background: #44bb44;
+        }
+
         /* Unified view */
         .unified-content {
             border: 1px solid var(--border-color);
@@ -388,6 +416,10 @@
                     <div class="legend-item">
                         <div class="legend-color diff-unchanged"></div>
                         <span data-i18n="word_compare_unchanged">Nội dung giữ nguyên</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffcc00;"></div>
+                        <span data-i18n="word_compare_space_diff">Khác biệt khoảng trắng (·)</span>
                     </div>
                 </div>
 
@@ -588,19 +620,52 @@
             if (!line) return '';
             
             const type = line.type;
-            const text = line.content;
             const className = `diff-line diff-${type}`;
             
+            // If line has inline segments (char-level diff), render them
+            if (line.segments && line.segments.length > 0) {
+                const html = renderSegments(line.segments);
+                return `<div class="${className}">${html}</div>`;
+            }
+            
+            const text = line.content;
             return `<div class="${className}">${escapeHtml(text)}</div>`;
+        }
+
+        function renderSegments(segments) {
+            return segments.map(seg => {
+                const escaped = escapeHtml(seg.text);
+                // Highlight spaces with visible markers
+                const spaceHighlighted = highlightSpaces(escaped, seg.type);
+                if (seg.type === 'equal') {
+                    return spaceHighlighted;
+                } else if (seg.type === 'removed') {
+                    return `<span class="inline-removed">${spaceHighlighted}</span>`;
+                } else if (seg.type === 'added') {
+                    return `<span class="inline-added">${spaceHighlighted}</span>`;
+                }
+                return spaceHighlighted;
+            }).join('');
+        }
+
+        function highlightSpaces(text, type) {
+            if (type === 'equal') return text;
+            // Replace spaces with visible dot markers
+            return text.replace(/ /g, '<span class="space-marker inline-' + type + '">·</span>');
         }
 
         function createUnifiedView(lines) {
             return lines.map(line => {
                 const type = line.type;
-                const text = line.content;
                 const prefix = type === 'removed' ? '✘ ' : type === 'added' ? '✓ ' : '';
                 const className = `diff-line diff-${type}`;
                 
+                if (line.segments && line.segments.length > 0) {
+                    const html = renderSegments(line.segments);
+                    return `<div class="${className}">${prefix}${html}</div>`;
+                }
+                
+                const text = line.content;
                 return `<div class="${className}">${prefix}${escapeHtml(text)}</div>`;
             }).join('');
         }

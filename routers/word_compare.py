@@ -14,27 +14,49 @@ def extract_text_from_docx(file_content: bytes) -> str:
         file_like = io.BytesIO(file_content)
         doc = Document(file_like)
         
-        # Extract all paragraphs
+        # Extract all paragraphs (keep empty ones for structure)
         text_lines = []
         for paragraph in doc.paragraphs:
-            if paragraph.text.strip():  # Only add non-empty paragraphs
-                text_lines.append(paragraph.text)
+            text_lines.append(paragraph.text)
         
         # Extract from tables
         for table in doc.tables:
             for row in table.rows:
                 row_text = []
                 for cell in row.cells:
-                    cell_text = cell.text.strip()
-                    if cell_text:
-                        row_text.append(cell_text)
-                if row_text:
+                    row_text.append(cell.text)
+                if any(t.strip() for t in row_text):
                     text_lines.append(" | ".join(row_text))
         
         return "\n".join(text_lines)
     except Exception as e:
         logger.error(f"Error extracting text from DOCX: {e}")
         raise ValueError(f"Error reading DOCX file: {str(e)}")
+
+def get_inline_diff(old_line: str, new_line: str) -> tuple:
+    """
+    Character-level diff between two lines.
+    Returns (old_segments, new_segments) where each segment is {'text': str, 'type': 'equal'|'removed'|'added'}
+    Spaces are preserved and highlighted when they differ.
+    """
+    char_matcher = SequenceMatcher(None, old_line, new_line)
+    old_segments = []
+    new_segments = []
+    
+    for tag, i1, i2, j1, j2 in char_matcher.get_opcodes():
+        if tag == 'equal':
+            old_segments.append({'text': old_line[i1:i2], 'type': 'equal'})
+            new_segments.append({'text': new_line[j1:j2], 'type': 'equal'})
+        elif tag == 'delete':
+            old_segments.append({'text': old_line[i1:i2], 'type': 'removed'})
+        elif tag == 'insert':
+            new_segments.append({'text': new_line[j1:j2], 'type': 'added'})
+        elif tag == 'replace':
+            old_segments.append({'text': old_line[i1:i2], 'type': 'removed'})
+            new_segments.append({'text': new_line[j1:j2], 'type': 'added'})
+    
+    return old_segments, new_segments
+
 
 def compare_texts(text1: str, text2: str) -> dict:
     """Compare two texts and return differences"""
@@ -92,8 +114,38 @@ def compare_texts(text1: str, text2: str) -> dict:
                 })
                 
         elif tag == 'replace':
-            # Different content (show as removed from file1, added to file2)
-            for line in lines1[i1:i2]:
+            # Character-level inline diff for paired lines
+            removed_lines = lines1[i1:i2]
+            added_lines = lines2[j1:j2]
+            
+            # Pair lines up for inline diff
+            paired = min(len(removed_lines), len(added_lines))
+            
+            for k in range(paired):
+                old_segments, new_segments = get_inline_diff(removed_lines[k], added_lines[k])
+                file1_result.append({
+                    'type': 'removed',
+                    'content': removed_lines[k],
+                    'segments': old_segments
+                })
+                file2_result.append({
+                    'type': 'added',
+                    'content': added_lines[k],
+                    'segments': new_segments
+                })
+                unified_result.append({
+                    'type': 'removed',
+                    'content': removed_lines[k],
+                    'segments': old_segments
+                })
+                unified_result.append({
+                    'type': 'added',
+                    'content': added_lines[k],
+                    'segments': new_segments
+                })
+            
+            # Remaining unpaired lines (no inline diff)
+            for line in removed_lines[paired:]:
                 file1_result.append({
                     'type': 'removed',
                     'content': line
@@ -102,7 +154,7 @@ def compare_texts(text1: str, text2: str) -> dict:
                     'type': 'removed',
                     'content': line
                 })
-            for line in lines2[j1:j2]:
+            for line in added_lines[paired:]:
                 file2_result.append({
                     'type': 'added',
                     'content': line
