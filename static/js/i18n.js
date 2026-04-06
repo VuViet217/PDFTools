@@ -222,6 +222,17 @@ const TRANSLATIONS = {
     pte_preview_title: "📋 Xem trước bảng tìm thấy",
     pte_success: "Tải xuống thành công!",
 
+    // Extract Images from PDF
+    pei_title: "Xuất hình ảnh từ PDF",
+    pei_desc: "Trích xuất tất cả hình ảnh có trong file PDF",
+    pei_drag_drop: "📁 Kéo thả file PDF hoặc click để chọn",
+    pei_max_size: "Tối đa 50MB",
+    pei_btn: "🖼️ Xuất hình ảnh",
+    pei_processing: "Đang trích xuất hình ảnh...",
+    pei_success: "Trích xuất thành công {count} hình ảnh! File đang tải xuống...",
+    pei_error_PDF_EMPTY: "PDF trống, không có trang nào",
+    pei_error_NO_IMAGES: "Không tìm thấy hình ảnh nào trong PDF",
+
     // Annotate PDF
     annotate_title: "Annotate PDF",
     annotate_desc: "Thêm chữ, highlight, vẽ, ký tên, chèn ảnh lên PDF",
@@ -266,6 +277,9 @@ const TRANSLATIONS = {
     annotate_dashed: "Nét đứt",
     annotate_dotted: "Chấm",
     annotate_sides: "Cạnh:",
+
+    // Homepage - Extract Pages Card
+    extract_pages_desc: "Trích xuất những trang cụ thể (VD: 1,2,5-10) từ PDF",
 
     // Footer
     footer_brand: "Được phát triển bởi <strong>Việt Đinh - IT OVNC</strong> • Hệ thống nội bộ — Chỉ dành cho nhân viên công ty",
@@ -497,6 +511,17 @@ const TRANSLATIONS = {
     pte_preview_title: "📋 検出された表のプレビュー",
     pte_success: "ダウンロード成功！",
 
+    // Extract Images from PDF
+    pei_title: "PDFから画像を抽出",
+    pei_desc: "PDFファイル内のすべての画像を抽出する",
+    pei_drag_drop: "📁 PDFファイルをドラッグするか、クリックして選択",
+    pei_max_size: "最大50MB",
+    pei_btn: "🖼️ 画像を抽出",
+    pei_processing: "画像を抽出中...",
+    pei_success: "{count}枚の画像を抽出しました！ダウンロード中...",
+    pei_error_PDF_EMPTY: "PDFが空です。ページがありません",
+    pei_error_NO_IMAGES: "PDFに画像が見つかりません",
+
     // Annotate PDF
     annotate_title: "PDF注釈",
     annotate_desc: "PDF上にテキスト、ハイライト、描画、署名、画像を追加",
@@ -541,6 +566,9 @@ const TRANSLATIONS = {
     annotate_dashed: "破線",
     annotate_dotted: "点線",
     annotate_sides: "辺数:",
+
+    // Homepage - Extract Pages Card
+    extract_pages_desc: "PDFから特定のページを抽出する（例：1,2,5-10）",
 
     // Footer
     footer_brand: "<strong>Việt Đinh - IT OVNC</strong> が開発 • 社内システム — 社員専用",

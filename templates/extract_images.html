@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xuất hình ảnh từ PDF | OVNC Tools</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.8">
+    <script src="/static/js/i18n.js?v=3.7"></script>
+    <script src="/static/js/header.js?v=1.7"></script>
+    <style>
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .page-title-icon { font-size: 40px; }
+        .extract-img-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8f9ff;
+        }
+        .upload-area:hover { border-color: #764ba2; background: #f0f2ff; }
+        .upload-area.dragover { border-color: #764ba2; background: #e8ebff; }
+        .upload-area p { margin: 0 0 10px; color: #667eea; font-weight: 600; font-size: 15px; }
+        .upload-area small { color: #999; font-size: 13px; }
+        .upload-area input[type="file"] { display: none; }
+
+        .info-box {
+            display: none;
+            margin: 20px 0;
+            padding: 15px;
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            border-radius: 4px;
+            color: #2e7d32;
+            font-size: 14px;
+        }
+        .info-box.show { display: block; }
+        .info-box strong { font-weight: 600; }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        .btn-primary, .btn-secondary {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+        }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-secondary:hover { background: #e0e0e0; }
+
+        .progress-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .progress-section.show { display: block; }
+        .spinner {
+            display: inline-block;
+            width: 20px; height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .progress-text { display: flex; align-items: center; font-size: 14px; color: #333; }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+        .result-section.show { display: block; }
+        .result-section .result-text {
+            font-size: 15px;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .preview-item {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .preview-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        .preview-item .preview-name {
+            padding: 6px 8px;
+            font-size: 11px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 20px; }
+            .extract-img-card { padding: 20px; }
+            .page-title { font-size: 24px; }
+            .button-group { flex-direction: column; }
+            .upload-area { padding: 20px; }
+            .preview-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header injected by header.js -->
+
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">
+                <span class="page-title-icon">🖼️</span>
+                <span data-i18n="pei_title">Xuất hình ảnh từ PDF</span>
+            </h1>
+
+            <div class="extract-img-card">
+                <!-- Upload -->
+                <div class="upload-area" id="uploadArea">
+                    <p data-i18n="pei_drag_drop">📁 Kéo thả file PDF hoặc click để chọn</p>
+                    <small data-i18n="pei_max_size">Tối đa 50MB</small>
+                    <input type="file" id="pdfFile" accept=".pdf">
+                </div>
+
+                <!-- File info -->
+                <div id="fileInfo" class="info-box">
+                    <strong data-i18n="extract_file_label">File:</strong> <span id="fileName"></span>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button class="btn-primary" id="extractBtn" disabled data-i18n="pei_btn">
+                        🖼️ Xuất hình ảnh
+                    </button>
+                    <button class="btn-secondary" id="resetBtn" data-i18n="btn_reset">Xóa</button>
+                </div>
+
+                <!-- Progress -->
+                <div class="progress-section" id="progressSection">
+                    <div class="progress-text">
+                        <div class="spinner"></div>
+                        <span id="progressText" data-i18n="pei_processing">Đang trích xuất hình ảnh...</span>
+                    </div>
+                </div>
+
+                <!-- Result -->
+                <div class="result-section" id="resultSection">
+                    <div class="result-text" id="resultText"></div>
+                    <div class="preview-grid" id="previewGrid"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/static/js/footer.js?v=2.5"></script>
+
+    <script>
+        // ============================================================================
+        // Helpers
+        // ============================================================================
+        function getCurrentLang() {
+            return localStorage.getItem('language') || localStorage.getItem('lang') || 'vi';
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('remove');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ============================================================================
+        // Elements
+        // ============================================================================
+        const uploadArea   = document.getElementById('uploadArea');
+        const pdfFile      = document.getElementById('pdfFile');
+        const fileInfo     = document.getElementById('fileInfo');
+        const fileName     = document.getElementById('fileName');
+        const extractBtn   = document.getElementById('extractBtn');
+        const resetBtn     = document.getElementById('resetBtn');
+        const progressSection = document.getElementById('progressSection');
+        const resultSection   = document.getElementById('resultSection');
+        const resultText      = document.getElementById('resultText');
+        const previewGrid     = document.getElementById('previewGrid');
+
+        // ============================================================================
+        // Upload area
+        // ============================================================================
+        uploadArea.addEventListener('click', () => pdfFile.click());
+
+        uploadArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                pdfFile.files = e.dataTransfer.files;
+                onFileSelected();
+            }
+        });
+
+        pdfFile.addEventListener('change', onFileSelected);
+
+        function onFileSelected() {
+            const file = pdfFile.files[0];
+            if (!file) return;
+            if (file.size > 50 * 1024 * 1024) {
+                showToast(t('toast_file_large'), 'error');
+                return;
+            }
+            fileName.textContent = file.name;
+            fileInfo.classList.add('show');
+            extractBtn.disabled = false;
+            resultSection.classList.remove('show');
+            previewGrid.innerHTML = '';
+        }
+
+        // ============================================================================
+        // Reset
+        // ============================================================================
+        resetBtn.addEventListener('click', () => {
+            pdfFile.value = '';
+            fileInfo.classList.remove('show');
+            extractBtn.disabled = true;
+            resultSection.classList.remove('show');
+            previewGrid.innerHTML = '';
+        });
+
+        // ============================================================================
+        // Extract
+        // ============================================================================
+        extractBtn.addEventListener('click', async () => {
+            const file = pdfFile.files[0];
+            if (!file) {
+                showToast(t('toast_no_file'), 'error');
+                return;
+            }
+
+            progressSection.classList.add('show');
+            resultSection.classList.remove('show');
+            extractBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/api/extract-images', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const totalImages = response.headers.get('X-Total-Images') || '?';
+                    const blob = await response.blob();
+
+                    // Auto download ZIP
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `pdf_images_${Date.now()}.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    a.remove();
+
+                    resultText.textContent = t('pei_success').replace('{count}', totalImages);
+                    resultSection.classList.add('show');
+
+                    // Preview images from ZIP
+                    await renderPreviews(blob);
+
+                    showToast(t('pei_success').replace('{count}', totalImages), 'success');
+                } else {
+                    const err = await response.json();
+                    const code = err.detail || 'UNKNOWN';
+                    const msg = t('pei_error_' + code) || t('toast_error');
+                    showToast(msg, 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast(t('toast_error'), 'error');
+            } finally {
+                progressSection.classList.remove('show');
+                extractBtn.disabled = false;
+            }
+        });
+
+        // ============================================================================
+        // Preview images from ZIP blob using JSZip-lite approach via manual parsing
+        // We'll just show filename list since we don't bundle JSZip.
+        // Actually, let's use the built-in Blob API: re-fetch from zip isn't trivial
+        // without a library. Instead, show count only.
+        // ============================================================================
+        async function renderPreviews(zipBlob) {
+            // Simple approach: no preview thumbnails (would need JSZip to unpack)
+            // The user already has the ZIP downloaded.
+            previewGrid.innerHTML = '';
+        }
+
+        // ============================================================================
+        // i18n
+        // ============================================================================
+        function waitAndApply() {
+            if (typeof applyLang === 'function' && typeof TRANSLATIONS !== 'undefined') {
+                applyLang();
+            } else {
+                setTimeout(waitAndApply, 50);
+            }
+        }
+        waitAndApply();
+
+        document.addEventListener('languageChanged', () => {
+            applyLang();
+        });
+
+        // Cleanup
+        window.addEventListener('beforeunload', () => {
+            navigator.sendBeacon('/api/cleanup');
+        });
+    </script>
+</body>
+</html>
