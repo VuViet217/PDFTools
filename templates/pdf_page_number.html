@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="pn_title">Đánh Số Trang PDF</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.8">
+    <script src="/static/js/i18n.js?v=4.0"></script>
+    <script src="/static/js/header.js?v=2.1"></script>
+    <style>
+        .main-content { flex: 1; padding: 40px; background: #f8f9fa; }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* Upload area */
+        .upload-area {
+            border: 3px dashed #ccc; border-radius: 16px; padding: 60px 20px;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            background: white; margin-bottom: 24px;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #667eea; background: #f0f0ff;
+        }
+        .upload-area.has-file {
+            border-color: #28a745; background: #f0fff4; padding: 30px 20px;
+        }
+        .upload-icon { font-size: 48px; margin-bottom: 12px; }
+        .upload-text { color: #666; font-size: 15px; }
+        .file-info { margin-top: 10px; }
+        .file-name { font-weight: 600; color: #333; font-size: 16px; }
+        .file-size { color: #888; font-size: 13px; margin-top: 4px; }
+
+        /* Options panel */
+        .options-panel {
+            background: white; border-radius: 12px; padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;
+        }
+        .options-panel h3 { margin: 0 0 20px 0; color: #333; font-size: 16px; }
+        .option-row {
+            display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 16px;
+            align-items: center;
+        }
+        .option-group { display: flex; flex-direction: column; gap: 6px; }
+        .option-group label { font-size: 13px; color: #555; font-weight: 500; }
+        .option-group select,
+        .option-group input {
+            padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 14px; background: #fafafa;
+        }
+        .option-group select:focus,
+        .option-group input:focus {
+            outline: none; border-color: #667eea;
+        }
+        .option-group input[type="color"] {
+            width: 45px; height: 36px; padding: 2px; cursor: pointer;
+        }
+        .option-group input[type="number"] { width: 80px; }
+
+        /* Format preview */
+        .format-preview {
+            background: #f8f9fa; border-radius: 8px; padding: 12px 16px;
+            font-size: 13px; color: #555; margin-top: 8px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .format-preview .preview-text {
+            font-weight: 600; color: #333; font-size: 15px;
+        }
+
+        /* Buttons */
+        .action-buttons {
+            display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 28px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-1px); box-shadow: 0 4px 15px rgba(40,167,69,0.4);
+        }
+
+        /* Progress */
+        .progress-bar {
+            display: none; background: white; border-radius: 12px; padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;
+        }
+        .progress-track {
+            height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px; transition: width 0.3s; width: 0%;
+        }
+        .progress-text { margin-top: 8px; font-size: 14px; color: #666; text-align: center; }
+
+        /* Result */
+        .result-panel {
+            display: none; background: white; border-radius: 12px; padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+        }
+        .result-panel .success-icon { font-size: 48px; margin-bottom: 12px; }
+        .result-panel .success-text { font-size: 18px; font-weight: 600; color: #28a745; margin-bottom: 8px; }
+        .result-panel .result-info { color: #666; font-size: 14px; margin-bottom: 20px; }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 20px; }
+            .option-row { gap: 12px; }
+            .action-buttons { flex-direction: column; }
+            .btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header injected by header.js -->
+    <main class="main-content">
+        <div class="container">
+            <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 8px; color: #333;">
+                <span style="font-size: 32px;">📄</span>
+                <span data-i18n="pn_title">Đánh Số Trang PDF</span>
+            </h1>
+            <p style="color: #666; margin-bottom: 24px; font-size: 15px;" data-i18n="pn_desc">
+                Tự động thêm số trang vào footer mỗi trang PDF
+            </p>
+
+            <!-- Upload -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text" data-i18n="pn_upload_hint">Kéo thả file PDF vào đây hoặc click để chọn</div>
+                <input type="file" id="fileInput" accept=".pdf" style="display:none">
+            </div>
+
+            <!-- Options -->
+            <div class="options-panel" id="optionsPanel">
+                <h3 data-i18n="pn_options">⚙️ Tùy chọn</h3>
+
+                <div class="option-row">
+                    <div class="option-group">
+                        <label data-i18n="pn_position">Vị trí</label>
+                        <select id="position">
+                            <option value="bottom-left" data-i18n="pn_pos_left">Dưới trái</option>
+                            <option value="bottom-center" selected data-i18n="pn_pos_center">Dưới giữa</option>
+                            <option value="bottom-right" data-i18n="pn_pos_right">Dưới phải</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label data-i18n="pn_format">Định dạng</label>
+                        <select id="formatTemplate">
+                            <option value="{n}">1, 2, 3...</option>
+                            <option value="- {n} -">- 1 -, - 2 -...</option>
+                            <option value="Trang {n}">Trang 1, Trang 2...</option>
+                            <option value="Page {n}">Page 1, Page 2...</option>
+                            <option value="{n} / {total}">1 / 10, 2 / 10...</option>
+                            <option value="Trang {n} / {total}">Trang 1 / 10...</option>
+                            <option value="Page {n} of {total}">Page 1 of 10...</option>
+                        </select>
+                    </div>
+
+                    <div class="option-group">
+                        <label data-i18n="pn_start_number">Bắt đầu từ</label>
+                        <input type="number" id="startNumber" value="1" min="1" max="9999">
+                    </div>
+                </div>
+
+                <div class="option-row">
+                    <div class="option-group">
+                        <label data-i18n="pn_font_size">Cỡ chữ</label>
+                        <input type="number" id="fontSize" value="11" min="6" max="36">
+                    </div>
+
+                    <div class="option-group">
+                        <label data-i18n="pn_margin">Khoảng cách dưới (pt)</label>
+                        <input type="number" id="marginBottom" value="30" min="10" max="100">
+                    </div>
+
+                    <div class="option-group">
+                        <label data-i18n="pn_color">Màu chữ</label>
+                        <input type="color" id="textColor" value="#000000">
+                    </div>
+                </div>
+
+                <div class="format-preview">
+                    <span data-i18n="pn_preview">Xem trước:</span>
+                    <span class="preview-text" id="previewText">1</span>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="btnProcess" disabled data-i18n="pn_btn_process">📄 Đánh số trang</button>
+                <button class="btn btn-success" id="btnDownload" style="display:none" data-i18n="pn_btn_download">⬇ Tải xuống</button>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText" data-i18n="pn_processing">Đang xử lý...</div>
+            </div>
+
+            <!-- Result -->
+            <div class="result-panel" id="resultPanel">
+                <div class="success-icon">✅</div>
+                <div class="success-text" data-i18n="pn_success">Đánh số trang thành công!</div>
+                <div class="result-info" id="resultInfo"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="/static/js/footer.js?v=2.5"></script>
+    <script>
+        const uploadArea   = document.getElementById('uploadArea');
+        const fileInput    = document.getElementById('fileInput');
+        const btnProcess   = document.getElementById('btnProcess');
+        const btnDownload  = document.getElementById('btnDownload');
+        const progressBar  = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const resultPanel  = document.getElementById('resultPanel');
+        const resultInfo   = document.getElementById('resultInfo');
+        const previewText  = document.getElementById('previewText');
+
+        let selectedFile = null;
+        let downloadUrl  = null;
+
+        // Upload area events
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length && files[0].type === 'application/pdf') handleFile(files[0]);
+        });
+        fileInput.addEventListener('change', e => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        function handleFile(file) {
+            selectedFile = file;
+            const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+            uploadArea.classList.add('has-file');
+            uploadArea.innerHTML = `
+                <div class="upload-icon">✅</div>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${sizeMB} MB</div>
+                </div>
+            `;
+            btnProcess.disabled = false;
+            btnDownload.style.display = 'none';
+            resultPanel.style.display = 'none';
+        }
+
+        // Preview format
+        function updatePreview() {
+            const fmt = document.getElementById('formatTemplate').value;
+            const start = parseInt(document.getElementById('startNumber').value) || 1;
+            const text = fmt.replace('{n}', start).replace('{total}', '10');
+            previewText.textContent = text;
+        }
+        document.getElementById('formatTemplate').addEventListener('change', updatePreview);
+        document.getElementById('startNumber').addEventListener('input', updatePreview);
+
+        // Process
+        btnProcess.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            btnProcess.disabled = true;
+            progressBar.style.display = 'block';
+            progressFill.style.width = '30%';
+            resultPanel.style.display = 'none';
+            btnDownload.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('position', document.getElementById('position').value);
+            formData.append('start_number', document.getElementById('startNumber').value);
+            formData.append('font_size', document.getElementById('fontSize').value);
+            formData.append('margin_bottom', document.getElementById('marginBottom').value);
+            formData.append('format_template', document.getElementById('formatTemplate').value);
+            formData.append('color', document.getElementById('textColor').value);
+
+            try {
+                progressFill.style.width = '60%';
+                const resp = await fetch('/api/add-page-numbers', { method: 'POST', body: formData });
+
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    throw new Error(err.detail || 'Lỗi xử lý');
+                }
+
+                progressFill.style.width = '90%';
+                const blob = await resp.blob();
+                const totalPages = resp.headers.get('X-Total-Pages') || '?';
+
+                if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+                downloadUrl = URL.createObjectURL(blob);
+
+                progressFill.style.width = '100%';
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                    resultPanel.style.display = 'block';
+                    const tTotal = (typeof t === 'function') ? t('pn_result_info') : null;
+                    resultInfo.textContent = tTotal
+                        ? tTotal.replace('{total}', totalPages)
+                        : `Đã đánh số ${totalPages} trang thành công`;
+                    btnDownload.style.display = 'inline-flex';
+                    btnProcess.disabled = false;
+                }, 300);
+
+            } catch (err) {
+                progressBar.style.display = 'none';
+                btnProcess.disabled = false;
+                showToast(err.message, 'error');
+            }
+        });
+
+        // Download
+        btnDownload.addEventListener('click', () => {
+            if (!downloadUrl) return;
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = 'numbered_' + (selectedFile ? selectedFile.name : 'output.pdf');
+            a.click();
+        });
+
+        // Toast
+        function showToast(msg, type = 'info') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => { t.classList.add('remove'); setTimeout(() => t.remove(), 300); }, 4000);
+        }
+
+        // i18n
+        function waitAndApply() {
+            if (typeof applyLang === 'function' && typeof TRANSLATIONS !== 'undefined') {
+                applyLang();
+            } else {
+                setTimeout(waitAndApply, 50);
+            }
+        }
+        waitAndApply();
+        document.addEventListener('languageChanged', () => { applyLang(); });
+
+        window.addEventListener('beforeunload', () => { navigator.sendBeacon('/api/cleanup'); });
+    </script>
+</body>
+</html>

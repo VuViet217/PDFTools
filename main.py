@@ -24,6 +24,7 @@ from routers.pdf_to_excel import router as pdf_to_excel_router
 from routers.annotate import router as annotate_router
 from routers.clipboard_cleaner import router as clipboard_cleaner_router
 from routers.extract_images import router as extract_images_router
+from routers.pdf_page_number import router as pdf_page_number_router
 
 # Import services
 from services.visitor_tracker import visitor_tracker
@@ -166,6 +167,7 @@ async def track_visitors(request, call_next):
             "/word-compare": "📝 So sánh Word",
             "/excel-compare": "📊 So sánh Excel",
             "/clipboard-cleaner": "🧹 Clipboard Cleaner",
+            "/pdf-page-number": "🔢 Đánh số trang PDF",
         }
         API_NAMES = {
             "/api/split": "✂️ Đang tách PDF",
@@ -183,6 +185,7 @@ async def track_visitors(request, call_next):
             "/api/compare-excel": "📊 Đang so sánh Excel",
             "/api/clean-text": "🧹 Đang làm sạch text",
             "/api/generate-password": "🔐 Đang tạo mật khẩu",
+            "/api/add-page-numbers": "🔢 Đang đánh số trang PDF",
         }
         
         if path in PAGE_NAMES:
@@ -232,6 +235,7 @@ app.include_router(pdf_to_excel_router, prefix="/api", tags=["pdf_to_excel"])
 app.include_router(annotate_router, prefix="/api", tags=["annotate"])
 app.include_router(clipboard_cleaner_router, prefix="/api", tags=["clipboard_cleaner"])
 app.include_router(extract_images_router, prefix="/api", tags=["extract_images"])
+app.include_router(pdf_page_number_router, prefix="/api", tags=["pdf_page_number"])
 
 # Root route - serve tools.html (main dashboard)
 @app.get("/", response_class=HTMLResponse)
@@ -321,6 +325,12 @@ async def extract_images_page():
 @app.get("/annotate", response_class=HTMLResponse)
 async def annotate_page():
     with open("templates/annotate.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# PDF Page Number page
+@app.get("/pdf-page-number", response_class=HTMLResponse)
+async def pdf_page_number_page():
+    with open("templates/pdf_page_number.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Clipboard Cleaner page

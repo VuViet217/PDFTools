@@ -47,6 +47,7 @@ function createHeader() {
               <a href="/pdf-to-excel" class="dropdown-item" data-i18n="pdf_to_excel_title">PDF sang Excel</a>
               <a href="/annotate" class="dropdown-item" data-i18n="annotate_title">Annotate PDF</a>
               <a href="/extract-images" class="dropdown-item" data-i18n="pei_title">Xuất hình ảnh từ PDF</a>
+              <a href="/pdf-page-number" class="dropdown-item" data-i18n="pn_title">Đánh Số Trang PDF</a>
             </div>
           </div>
 
