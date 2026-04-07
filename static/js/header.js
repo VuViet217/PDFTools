@@ -50,6 +50,8 @@ function createHeader() {
             </div>
           </div>
 
+          <a href="/clipboard-cleaner" class="nav-link" data-i18n="tool_clipboard">Clipboard Cleaner</a>
+
           <a href="/image-converter" class="nav-link" data-i18n="tool_image">Chuyển đổi ảnh</a>
 
           <a href="/password-generator" class="nav-link" data-i18n="tool_password">Tạo Mật Khẩu</a>

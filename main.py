@@ -22,6 +22,7 @@ from routers.excel_compare import router as excel_compare_router
 from routers.pdf_to_image import router as pdf_to_image_router
 from routers.pdf_to_excel import router as pdf_to_excel_router
 from routers.annotate import router as annotate_router
+from routers.clipboard_cleaner import router as clipboard_cleaner_router
 from routers.extract_images import router as extract_images_router
 
 # Import services
@@ -133,16 +134,75 @@ app.add_middleware(
 async def track_visitors(request, call_next):
     """Theo dõi số lượng người dùng truy cập - mỗi phiên chỉ tính 1 lần"""
     client_ip = request.client.host if request.client else "unknown"
+    path = request.url.path
+    method = request.method
     
     # Lấy session_id từ cookie, nếu không có thì tạo mới
     session_id = request.cookies.get("session_id")
+    is_new = not session_id
     if not session_id:
         session_id = str(uuid.uuid4())
     
     # Track visit với session_id
     visitor_tracker.track_visit(session_id, client_ip)
     
+    # Log chi tiết ra terminal (bỏ qua static files và favicon)
+    if not path.startswith("/static") and not path.startswith("/uploads") and path != "/favicon.ico":
+        # Map path -> tên chức năng
+        PAGE_NAMES = {
+            "/": "🏠 Dashboard",
+            "/pdf": "📄 PDF Tools",
+            "/split-merge": "✂️ Tách/Nối PDF",
+            "/extract-pages": "📑 Tách Trang",
+            "/editor": "✏️ Chỉnh sửa PDF",
+            "/compress": "🗜️ Nén PDF",
+            "/security": "🔒 Bảo mật PDF",
+            "/pdf-to-image": "🖼️ PDF→Ảnh",
+            "/pdf-to-excel": "📊 PDF→Excel",
+            "/annotate": "📝 Annotate PDF",
+            "/extract-images": "🎨 Xuất ảnh từ PDF",
+            "/image-converter": "🔄 Chuyển đổi ảnh",
+            "/password-generator": "🔐 Tạo mật khẩu",
+            "/word-compare": "📝 So sánh Word",
+            "/excel-compare": "📊 So sánh Excel",
+            "/clipboard-cleaner": "🧹 Clipboard Cleaner",
+        }
+        API_NAMES = {
+            "/api/split": "✂️ Đang tách PDF",
+            "/api/merge": "📎 Đang nối PDF",
+            "/api/extract-pages": "📑 Đang tách trang",
+            "/api/edit-pdf": "✏️ Đang sửa PDF",
+            "/api/compress": "🗜️ Đang nén PDF",
+            "/api/protect": "🔒 Đang mã hóa PDF",
+            "/api/unlock": "🔓 Đang mở khóa PDF",
+            "/api/pdf-to-image": "🖼️ Đang chuyển PDF→Ảnh",
+            "/api/pdf-to-excel": "📊 Đang chuyển PDF→Excel",
+            "/api/convert-image": "🔄 Đang chuyển đổi ảnh",
+            "/api/extract-images": "🎨 Đang xuất ảnh từ PDF",
+            "/api/compare-word": "📝 Đang so sánh Word",
+            "/api/compare-excel": "📊 Đang so sánh Excel",
+            "/api/clean-text": "🧹 Đang làm sạch text",
+            "/api/generate-password": "🔐 Đang tạo mật khẩu",
+        }
+        
+        if path in PAGE_NAMES:
+            action = PAGE_NAMES[path]
+            new_tag = " 🆕" if is_new else ""
+            logger.info(f"👤 {client_ip}{new_tag} → {action}")
+        elif path in API_NAMES:
+            action = API_NAMES[path]
+            logger.info(f"⚡ {client_ip} → {action}")
+        elif path.startswith("/api/"):
+            logger.info(f"⚡ {client_ip} → API: {method} {path}")
+    
+    start_time = time.time()
     response = await call_next(request)
+    duration = time.time() - start_time
+    
+    # Log thời gian xử lý cho API calls
+    if path.startswith("/api/") and not path.startswith("/api/visitor") and not path.startswith("/api/client"):
+        status = response.status_code
+        logger.info(f"  ✅ {path} → {status} ({duration:.1f}s)")
     
     # Set cookie với session_id (15 ngày)
     response.set_cookie(
@@ -170,6 +230,7 @@ app.include_router(excel_compare_router, prefix="/api", tags=["excel_compare"])
 app.include_router(pdf_to_image_router, prefix="/api", tags=["pdf_to_image"])
 app.include_router(pdf_to_excel_router, prefix="/api", tags=["pdf_to_excel"])
 app.include_router(annotate_router, prefix="/api", tags=["annotate"])
+app.include_router(clipboard_cleaner_router, prefix="/api", tags=["clipboard_cleaner"])
 app.include_router(extract_images_router, prefix="/api", tags=["extract_images"])
 
 # Root route - serve tools.html (main dashboard)
@@ -260,6 +321,12 @@ async def extract_images_page():
 @app.get("/annotate", response_class=HTMLResponse)
 async def annotate_page():
     with open("templates/annotate.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# Clipboard Cleaner page
+@app.get("/clipboard-cleaner", response_class=HTMLResponse)
+async def clipboard_cleaner_page():
+    with open("templates/clipboard_cleaner.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Manual cleanup endpoint - người dùng có thể gọi khi kết thúc session
