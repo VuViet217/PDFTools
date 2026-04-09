@@ -223,6 +223,26 @@ const TRANSLATIONS = {
     pn_success: "Đánh số trang thành công!",
     pn_result_info: "Đã đánh số {total} trang thành công",
 
+    // PDF Enhance
+    pe_title: "Làm Rõ PDF",
+    pe_desc: "Cải thiện chất lượng file PDF scan, làm rõ chữ, sạch nền, tăng độ tương phản",
+    pe_upload_hint: "Kéo thả file PDF scan vào đây hoặc click để chọn",
+    pe_mode_label: "🎯 Chọn chế độ xử lý",
+    pe_mode_auto: "Tự động",
+    pe_mode_auto_desc: "Phát hiện và xử lý tự động",
+    pe_mode_text: "Văn bản",
+    pe_mode_text_desc: "Tối ưu cho tài liệu chữ",
+    pe_mode_photo: "Ảnh chụp",
+    pe_mode_photo_desc: "Giữ màu, tăng nét ảnh",
+    pe_dpi: "Độ phân giải (DPI)",
+    pe_tips_title: "💡 Mẹo sử dụng",
+    pe_tips_content: "• Chế độ \"Tự động\" phù hợp cho hầu hết tài liệu scan. • Chế độ \"Văn bản\" cho kết quả tốt nhất với tài liệu chỉ có chữ (đen trắng). • DPI 200 là đủ cho hầu hết file, DPI 300 cho file cần chi tiết cao.",
+    pe_btn_process: "✨ Làm rõ PDF",
+    pe_btn_download: "⬇ Tải xuống",
+    pe_processing: "Đang xử lý... Quá trình này có thể mất vài phút.",
+    pe_success: "Làm rõ PDF thành công!",
+    pe_result_info: "📄 {pages} trang đã xử lý<br>📦 {orig} MB → {new} MB",
+
     // Word Compare
     word_compare_title: "So Sánh Word",
     word_compare_upload1: "Tải lên File 1 (.docx)",
@@ -565,6 +585,26 @@ const TRANSLATIONS = {
     pn_processing: "処理中...",
     pn_success: "ページ番号の追加が完了しました！",
     pn_result_info: "{total}ページに番号を追加しました",
+
+    // PDF Enhance
+    pe_title: "PDFスキャン補正",
+    pe_desc: "スキャンPDFの品質を改善、文字を鮮明に、背景をクリーンに、コントラストを向上",
+    pe_upload_hint: "スキャンPDFをここにドラッグするか、クリックして選択",
+    pe_mode_label: "🎯 処理モードを選択",
+    pe_mode_auto: "自動",
+    pe_mode_auto_desc: "自動検出して処理",
+    pe_mode_text: "テキスト",
+    pe_mode_text_desc: "文書に最適化",
+    pe_mode_photo: "写真",
+    pe_mode_photo_desc: "色を保持、画像を鮮明に",
+    pe_dpi: "解像度 (DPI)",
+    pe_tips_title: "💡 使い方のコツ",
+    pe_tips_content: "• \"自動\"モードはほとんどのスキャン文書に適しています。 • \"テキスト\"モードはテキストのみの文書（白黒）に最適です。 • DPI 200はほとんどのファイルに十分、DPI 300は高品質が必要なファイルに。",
+    pe_btn_process: "✨ PDF補正",
+    pe_btn_download: "⬇ ダウンロード",
+    pe_processing: "処理中... 数分かかる場合があります。",
+    pe_success: "PDF補正が完了しました！",
+    pe_result_info: "📄 {pages}ページを処理しました<br>📦 {orig} MB → {new} MB",
 
     // Word Compare
     word_compare_title: "Word比較",

@@ -48,6 +48,7 @@ function createHeader() {
               <a href="/annotate" class="dropdown-item" data-i18n="annotate_title">Annotate PDF</a>
               <a href="/extract-images" class="dropdown-item" data-i18n="pei_title">Xuất hình ảnh từ PDF</a>
               <a href="/pdf-page-number" class="dropdown-item" data-i18n="pn_title">Đánh Số Trang PDF</a>
+              <a href="/pdf-enhance" class="dropdown-item" data-i18n="pe_title">Làm Rõ PDF</a>
             </div>
           </div>
 

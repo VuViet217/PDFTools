@@ -25,6 +25,8 @@ from routers.annotate import router as annotate_router
 from routers.clipboard_cleaner import router as clipboard_cleaner_router
 from routers.extract_images import router as extract_images_router
 from routers.pdf_page_number import router as pdf_page_number_router
+from routers.pdf_enhance import router as pdf_enhance_router
+from routers.pdf_enhance import router as pdf_enhance_router
 
 # Import services
 from services.visitor_tracker import visitor_tracker
@@ -167,7 +169,9 @@ async def track_visitors(request, call_next):
             "/word-compare": "📝 So sánh Word",
             "/excel-compare": "📊 So sánh Excel",
             "/clipboard-cleaner": "🧹 Clipboard Cleaner",
+            "/pdf-enhance": "✨ Làm rõ PDF",
             "/pdf-page-number": "🔢 Đánh số trang PDF",
+            "/pdf-enhance": "✨ Làm rõ PDF",
         }
         API_NAMES = {
             "/api/split": "✂️ Đang tách PDF",
@@ -184,8 +188,10 @@ async def track_visitors(request, call_next):
             "/api/compare-word": "📝 Đang so sánh Word",
             "/api/compare-excel": "📊 Đang so sánh Excel",
             "/api/clean-text": "🧹 Đang làm sạch text",
+            "/api/enhance-pdf": "✨ Đang làm rõ PDF",
             "/api/generate-password": "🔐 Đang tạo mật khẩu",
             "/api/add-page-numbers": "🔢 Đang đánh số trang PDF",
+            "/api/enhance-pdf": "✨ Đang làm rõ PDF",
         }
         
         if path in PAGE_NAMES:
@@ -233,9 +239,11 @@ app.include_router(excel_compare_router, prefix="/api", tags=["excel_compare"])
 app.include_router(pdf_to_image_router, prefix="/api", tags=["pdf_to_image"])
 app.include_router(pdf_to_excel_router, prefix="/api", tags=["pdf_to_excel"])
 app.include_router(annotate_router, prefix="/api", tags=["annotate"])
+app.include_router(pdf_enhance_router, prefix="/api", tags=["pdf_enhance"])
 app.include_router(clipboard_cleaner_router, prefix="/api", tags=["clipboard_cleaner"])
 app.include_router(extract_images_router, prefix="/api", tags=["extract_images"])
 app.include_router(pdf_page_number_router, prefix="/api", tags=["pdf_page_number"])
+app.include_router(pdf_enhance_router, prefix="/api", tags=["pdf_enhance"])
 
 # Root route - serve tools.html (main dashboard)
 @app.get("/", response_class=HTMLResponse)
@@ -331,6 +339,12 @@ async def annotate_page():
 @app.get("/pdf-page-number", response_class=HTMLResponse)
 async def pdf_page_number_page():
     with open("templates/pdf_page_number.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# PDF Enhance page
+@app.get("/pdf-enhance", response_class=HTMLResponse)
+async def pdf_enhance_page():
+    with open("templates/pdf_enhance.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Clipboard Cleaner page

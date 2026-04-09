@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="pe_title">Làm Rõ PDF</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.8">
+    <script src="/static/js/i18n.js?v=4.2"></script>
+    <script src="/static/js/header.js?v=2.3"></script>
+    <style>
+        .main-content { flex: 1; padding: 40px; background: #f8f9fa; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .page-title {
+            font-size: 28px; font-weight: 700; margin-bottom: 8px; color: #333;
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        /* Upload */
+        .upload-area {
+            border: 3px dashed #ccc; border-radius: 16px; padding: 60px 20px;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            background: white; margin-bottom: 24px;
+        }
+        .upload-area:hover, .upload-area.dragover { border-color: #667eea; background: #f0f0ff; }
+        .upload-area.has-file { border-color: #28a745; background: #f0fff4; padding: 30px 20px; }
+        .upload-icon { font-size: 48px; margin-bottom: 12px; }
+        .upload-text { color: #666; font-size: 15px; }
+        .file-name { font-weight: 600; color: #333; font-size: 16px; }
+        .file-size { color: #888; font-size: 13px; margin-top: 4px; }
+
+        /* Options */
+        .options-panel {
+            background: white; border-radius: 12px; padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;
+        }
+        .options-panel h3 { margin: 0 0 20px; color: #333; font-size: 16px; }
+        .option-row {
+            display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;
+        }
+        .option-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; }
+        .option-group label { font-size: 13px; color: #555; font-weight: 500; }
+        .option-group select, .option-group input {
+            padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 14px; background: #fafafa;
+        }
+        .option-group select:focus, .option-group input:focus { outline: none; border-color: #667eea; }
+
+        /* Mode cards */
+        .mode-cards { display: flex; gap: 12px; flex-wrap: wrap; }
+        .mode-card {
+            flex: 1; min-width: 140px; padding: 16px; border: 2px solid #e0e0e0;
+            border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.2s;
+            background: white;
+        }
+        .mode-card:hover { border-color: #667eea; background: #f8f8ff; }
+        .mode-card.active { border-color: #667eea; background: #eef0ff; box-shadow: 0 0 0 3px rgba(102,126,234,0.15); }
+        .mode-card .mode-icon { font-size: 28px; margin-bottom: 6px; }
+        .mode-card .mode-name { font-weight: 600; font-size: 14px; color: #333; }
+        .mode-card .mode-desc { font-size: 12px; color: #888; margin-top: 4px; }
+
+        /* Buttons */
+        .action-buttons { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 28px; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102,126,234,0.4); }
+        .btn-success { background: linear-gradient(135deg, #28a745, #20c997); color: white; }
+        .btn-success:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(40,167,69,0.4); }
+
+        /* Progress */
+        .progress-bar {
+            display: none; background: white; border-radius: 12px; padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;
+        }
+        .progress-track { height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px; transition: width 0.3s; width: 0%;
+        }
+        .progress-text { margin-top: 10px; font-size: 14px; color: #666; text-align: center; }
+
+        /* Result */
+        .result-panel {
+            display: none; background: white; border-radius: 12px; padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+        }
+        .result-panel .success-icon { font-size: 48px; margin-bottom: 12px; }
+        .result-panel .success-text { font-size: 18px; font-weight: 600; color: #28a745; margin-bottom: 12px; }
+        .result-info { color: #666; font-size: 14px; margin-bottom: 20px; line-height: 1.8; }
+
+        /* Tips */
+        .tips-box {
+            background: #fff8e6; border: 1px solid #ffe0a0; border-radius: 10px;
+            padding: 16px 20px; margin-bottom: 24px; font-size: 13px; color: #7a6100;
+        }
+        .tips-box strong { display: block; margin-bottom: 6px; font-size: 14px; }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 20px; }
+            .mode-cards { flex-direction: column; }
+            .action-buttons { flex-direction: column; }
+            .btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header injected by header.js -->
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">
+                <span style="font-size: 32px;">✨</span>
+                <span data-i18n="pe_title">Làm Rõ PDF</span>
+            </h1>
+            <p style="color: #666; margin-bottom: 24px; font-size: 15px;" data-i18n="pe_desc">
+                Cải thiện chất lượng file PDF scan, làm rõ chữ, sạch nền, tăng độ tương phản
+            </p>
+
+            <!-- Upload -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text" data-i18n="pe_upload_hint">Kéo thả file PDF scan vào đây hoặc click để chọn</div>
+                <input type="file" id="fileInput" accept=".pdf" style="display:none">
+            </div>
+
+            <!-- Options -->
+            <div class="options-panel">
+                <h3 data-i18n="pe_mode_label">🎯 Chọn chế độ xử lý</h3>
+                <div class="mode-cards" id="modeCards">
+                    <div class="mode-card active" data-mode="auto">
+                        <div class="mode-icon">🤖</div>
+                        <div class="mode-name" data-i18n="pe_mode_auto">Tự động</div>
+                        <div class="mode-desc" data-i18n="pe_mode_auto_desc">Phát hiện và xử lý tự động</div>
+                    </div>
+                    <div class="mode-card" data-mode="text">
+                        <div class="mode-icon">📝</div>
+                        <div class="mode-name" data-i18n="pe_mode_text">Văn bản</div>
+                        <div class="mode-desc" data-i18n="pe_mode_text_desc">Tối ưu cho tài liệu chữ</div>
+                    </div>
+                    <div class="mode-card" data-mode="photo">
+                        <div class="mode-icon">📷</div>
+                        <div class="mode-name" data-i18n="pe_mode_photo">Ảnh chụp</div>
+                        <div class="mode-desc" data-i18n="pe_mode_photo_desc">Giữ màu, tăng nét ảnh</div>
+                    </div>
+                </div>
+
+                <div class="option-row" style="margin-top: 20px;">
+                    <div class="option-group">
+                        <label data-i18n="pe_dpi">Độ phân giải (DPI)</label>
+                        <select id="dpiSelect">
+                            <option value="150">150 DPI — Nhanh</option>
+                            <option value="200" selected>200 DPI — Cân bằng</option>
+                            <option value="300">300 DPI — Chất lượng cao</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="tips-box">
+                <strong data-i18n="pe_tips_title">💡 Mẹo sử dụng</strong>
+                <span data-i18n="pe_tips_content">
+                    • Chế độ "Tự động" phù hợp cho hầu hết tài liệu scan.
+                    • Chế độ "Văn bản" cho kết quả tốt nhất với tài liệu chỉ có chữ (đen trắng).
+                    • DPI 200 là đủ cho hầu hết file, DPI 300 cho file cần chi tiết cao.
+                </span>
+            </div>
+
+            <!-- Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="btnProcess" disabled data-i18n="pe_btn_process">✨ Làm rõ PDF</button>
+                <button class="btn btn-success" id="btnDownload" style="display:none" data-i18n="pe_btn_download">⬇ Tải xuống</button>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText" data-i18n="pe_processing">Đang xử lý... Quá trình này có thể mất vài phút.</div>
+            </div>
+
+            <!-- Result -->
+            <div class="result-panel" id="resultPanel">
+                <div class="success-icon">✅</div>
+                <div class="success-text" data-i18n="pe_success">Làm rõ PDF thành công!</div>
+                <div class="result-info" id="resultInfo"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="/static/js/footer.js?v=2.5"></script>
+    <script>
+        const uploadArea   = document.getElementById('uploadArea');
+        const fileInput    = document.getElementById('fileInput');
+        const btnProcess   = document.getElementById('btnProcess');
+        const btnDownload  = document.getElementById('btnDownload');
+        const progressBar  = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const resultPanel  = document.getElementById('resultPanel');
+        const resultInfo   = document.getElementById('resultInfo');
+        const modeCards    = document.querySelectorAll('.mode-card');
+
+        let selectedFile = null;
+        let downloadUrl  = null;
+        let selectedMode = 'auto';
+
+        // Mode selection
+        modeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                modeCards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                selectedMode = card.dataset.mode;
+            });
+        });
+
+        // Upload
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length && e.dataTransfer.files[0].type === 'application/pdf')
+                handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+        function handleFile(file) {
+            selectedFile = file;
+            const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+            uploadArea.classList.add('has-file');
+            uploadArea.innerHTML = `
+                <div class="upload-icon">✅</div>
+                <div>
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${sizeMB} MB</div>
+                </div>
+            `;
+            btnProcess.disabled = false;
+            btnDownload.style.display = 'none';
+            resultPanel.style.display = 'none';
+        }
+
+        // Process
+        btnProcess.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            btnProcess.disabled = true;
+            progressBar.style.display = 'block';
+            progressFill.style.width = '15%';
+            resultPanel.style.display = 'none';
+            btnDownload.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('mode', selectedMode);
+            formData.append('dpi', document.getElementById('dpiSelect').value);
+
+            // Simulate progress
+            let progress = 15;
+            const progressTimer = setInterval(() => {
+                if (progress < 85) { progress += Math.random() * 5; progressFill.style.width = progress + '%'; }
+            }, 500);
+
+            try {
+                const resp = await fetch('/api/enhance-pdf', { method: 'POST', body: formData });
+
+                clearInterval(progressTimer);
+
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    throw new Error(err.detail || 'Lỗi xử lý');
+                }
+
+                progressFill.style.width = '95%';
+                const blob = await resp.blob();
+                const totalPages  = resp.headers.get('X-Total-Pages') || '?';
+                const origSize    = parseInt(resp.headers.get('X-Original-Size') || '0');
+                const newSize     = parseInt(resp.headers.get('X-New-Size') || '0');
+
+                if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+                downloadUrl = URL.createObjectURL(blob);
+
+                progressFill.style.width = '100%';
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                    resultPanel.style.display = 'block';
+
+                    const origMB = (origSize / 1024 / 1024).toFixed(1);
+                    const newMB  = (newSize / 1024 / 1024).toFixed(1);
+
+                    const infoT = (typeof t === 'function') ? t('pe_result_info') : null;
+                    if (infoT && !infoT.startsWith('pe_')) {
+                        resultInfo.innerHTML = infoT
+                            .replace('{pages}', totalPages)
+                            .replace('{orig}', origMB)
+                            .replace('{new}', newMB);
+                    } else {
+                        resultInfo.innerHTML = `📄 ${totalPages} trang đã xử lý<br>📦 ${origMB} MB → ${newMB} MB`;
+                    }
+                    btnDownload.style.display = 'inline-flex';
+                    btnProcess.disabled = false;
+                }, 300);
+
+            } catch (err) {
+                clearInterval(progressTimer);
+                progressBar.style.display = 'none';
+                btnProcess.disabled = false;
+                showToast(err.message, 'error');
+            }
+        });
+
+        // Download
+        btnDownload.addEventListener('click', () => {
+            if (!downloadUrl) return;
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = 'enhanced_' + (selectedFile ? selectedFile.name : 'output.pdf');
+            a.click();
+        });
+
+        // Toast
+        function showToast(msg, type = 'info') {
+            const c = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = 'toast ' + type;
+            el.textContent = msg;
+            c.appendChild(el);
+            setTimeout(() => { el.classList.add('remove'); setTimeout(() => el.remove(), 300); }, 4000);
+        }
+
+        // i18n
+        function waitAndApply() {
+            if (typeof applyLang === 'function' && typeof TRANSLATIONS !== 'undefined') applyLang();
+            else setTimeout(waitAndApply, 50);
+        }
+        waitAndApply();
+        document.addEventListener('languageChanged', () => { applyLang(); });
+        window.addEventListener('beforeunload', () => { navigator.sendBeacon('/api/cleanup'); });
+    </script>
+</body>
+</html>
