@@ -62,6 +62,8 @@ function createHeader() {
           <a href="/word-compare" class="nav-link" data-i18n="tool_word_compare">So Sánh Word</a>
 
           <a href="/excel-compare" class="nav-link" data-i18n="tool_excel_compare">So Sánh Excel</a>
+
+          <a href="/about" class="nav-link" data-i18n="about_title">Giới Thiệu</a>
         </nav>
 
         <!-- Language Selector with Flags -->

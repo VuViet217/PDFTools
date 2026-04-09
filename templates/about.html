@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="about_title">Giới Thiệu - OVNC Tools</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.8">
+    <script src="/static/js/i18n.js?v=4.4"></script>
+    <script src="/static/js/header.js?v=2.5"></script>
+    <style>
+        .about-page { max-width: 860px; margin: 100px auto 60px; padding: 0 20px; }
+
+        /* Hero Section */
+        .about-hero {
+            text-align: center;
+            padding: 60px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            color: #fff;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,.08) 0%, transparent 60%);
+            animation: float 8s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(5deg); }
+            66% { transform: translate(-20px, 20px) rotate(-3deg); }
+        }
+        .about-hero .logo { font-size: 4rem; margin-bottom: 15px; position: relative; }
+        .about-hero h1 { font-size: 2.2rem; margin-bottom: 10px; position: relative; }
+        .about-hero .version { 
+            display: inline-block; 
+            background: rgba(255,255,255,.2); 
+            padding: 4px 16px; 
+            border-radius: 20px; 
+            font-size: .85rem; 
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .about-hero .tagline {
+            font-size: 1.1rem;
+            opacity: .9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        /* Info Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .info-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px 24px;
+            box-shadow: 0 2px 16px rgba(0,0,0,.06);
+            border: 1px solid #f0f0f0;
+            transition: all .3s;
+        }
+        .info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,.1);
+        }
+        .info-card .card-icon { font-size: 2rem; margin-bottom: 12px; }
+        .info-card h3 { color: #1a1a2e; margin-bottom: 8px; font-size: 1.1rem; }
+        .info-card p { color: #666; font-size: .92rem; line-height: 1.7; }
+
+        /* Full-width card */
+        .info-card.full { grid-column: 1 / -1; }
+
+        /* Tech Stack */
+        .tech-section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 35px 30px;
+            box-shadow: 0 2px 16px rgba(0,0,0,.06);
+            border: 1px solid #f0f0f0;
+            margin-bottom: 40px;
+        }
+        .tech-section h2 {
+            text-align: center;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+        }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all .2s;
+        }
+        .tech-item:hover { background: #eef2ff; transform: translateX(4px); }
+        .tech-item .tech-icon { font-size: 1.5rem; }
+        .tech-item .tech-name { font-weight: 600; color: #333; font-size: .92rem; }
+        .tech-item .tech-desc { font-size: .78rem; color: #888; }
+
+        /* Features List */
+        .features-section {
+            background: linear-gradient(135deg, #f8f9ff, #eef2ff);
+            border-radius: 16px;
+            padding: 35px 30px;
+            margin-bottom: 40px;
+        }
+        .features-section h2 {
+            text-align: center;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+        }
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #fff;
+            border-radius: 10px;
+            font-size: .92rem;
+            color: #444;
+            box-shadow: 0 1px 4px rgba(0,0,0,.04);
+        }
+        .feature-item .fi { font-size: 1.2rem; }
+
+        /* Privacy Section */
+        .privacy-section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 35px 30px;
+            box-shadow: 0 2px 16px rgba(0,0,0,.06);
+            border: 1px solid #f0f0f0;
+            margin-bottom: 40px;
+        }
+        .privacy-section h2 { text-align: center; color: #1a1a2e; margin-bottom: 20px; }
+        .privacy-list { list-style: none; padding: 0; }
+        .privacy-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+            font-size: .95rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .privacy-list li:last-child { border-bottom: none; }
+        .privacy-list .pi { font-size: 1.1rem; flex-shrink: 0; }
+
+        /* Developer Card */
+        .dev-card {
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 40px 30px;
+            color: #fff;
+            margin-bottom: 40px;
+        }
+        .dev-card .avatar {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 20px rgba(102,126,234,.4);
+        }
+        .dev-card h3 { font-size: 1.4rem; margin-bottom: 6px; }
+        .dev-card .role { color: #a0aec0; font-size: .95rem; margin-bottom: 20px; }
+        .dev-card .quote {
+            font-style: italic;
+            color: #cbd5e0;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.7;
+            font-size: .95rem;
+        }
+
+        @media (max-width: 768px) {
+            .about-page { margin-top: 80px; }
+            .info-grid { grid-template-columns: 1fr; }
+            .about-hero h1 { font-size: 1.6rem; }
+            .about-hero { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="about-page">
+
+    <!-- Hero -->
+    <div class="about-hero">
+        <div class="logo">📊</div>
+        <h1>OVNC Tools</h1>
+        <div class="version">v2.0 — 2026</div>
+        <p class="tagline" data-i18n="about_tagline">Bộ công cụ xử lý tài liệu nội bộ — Được phát triển để hỗ trợ nhân viên OVNC giảm tải công việc lặp lại, tăng hiệu suất làm việc mỗi ngày.</p>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="card-icon">🎯</div>
+            <h3 data-i18n="about_mission_title">Sứ mệnh</h3>
+            <p data-i18n="about_mission_text">Giúp nhân viên OVNC tiết kiệm thời gian xử lý các công việc lặp lại hằng ngày như chỉnh sửa PDF, chuyển đổi file, so sánh tài liệu... để tập trung vào những việc quan trọng hơn.</p>
+        </div>
+        <div class="info-card">
+            <div class="card-icon">💡</div>
+            <h3 data-i18n="about_why_title">Tại sao OVNC Tools?</h3>
+            <p data-i18n="about_why_text">Không cần cài đặt phần mềm, không cần tài khoản, không upload dữ liệu lên internet. Mọi thứ xử lý trên server nội bộ — nhanh, an toàn, miễn phí.</p>
+        </div>
+        <div class="info-card">
+            <div class="card-icon">🔓</div>
+            <h3 data-i18n="about_opensource_title">Mã nguồn mở</h3>
+            <p data-i18n="about_opensource_text">OVNC Tools được phát triển bằng Python + FastAPI, hoàn toàn mã nguồn mở. Sử dụng miễn phí, không quảng cáo, không theo dõi người dùng.</p>
+        </div>
+        <div class="info-card">
+            <div class="card-icon">🛡️</div>
+            <h3 data-i18n="about_nodata_title">Không lưu trữ dữ liệu</h3>
+            <p data-i18n="about_nodata_text">Hệ thống KHÔNG sử dụng database. File upload được xử lý tức thì và tự động xóa sau vài giây. Không dữ liệu nào của bạn được lưu trên server.</p>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-section">
+        <h2 data-i18n="about_features_title">📦 Tính năng hiện có</h2>
+        <div class="feature-list">
+            <div class="feature-item"><span class="fi">📄</span> <span data-i18n="nav_split_merge">Tách / Nối PDF</span></div>
+            <div class="feature-item"><span class="fi">✂️</span> <span data-i18n="nav_extract_pages">Tách Trang Cụ Thể</span></div>
+            <div class="feature-item"><span class="fi">✏️</span> <span data-i18n="nav_editor">Chỉnh sửa PDF</span></div>
+            <div class="feature-item"><span class="fi">🗜️</span> <span data-i18n="nav_compress">Nén PDF</span></div>
+            <div class="feature-item"><span class="fi">🔒</span> <span data-i18n="nav_security">Bảo mật PDF</span></div>
+            <div class="feature-item"><span class="fi">🖼️</span> <span data-i18n="pdf_to_image_title">PDF sang Ảnh</span></div>
+            <div class="feature-item"><span class="fi">📊</span> <span data-i18n="pdf_to_excel_title">PDF sang Excel</span></div>
+            <div class="feature-item"><span class="fi">📝</span> <span data-i18n="annotate_title">Annotate PDF</span></div>
+            <div class="feature-item"><span class="fi">🖼️</span> <span data-i18n="pei_title">Xuất hình ảnh từ PDF</span></div>
+            <div class="feature-item"><span class="fi">🔢</span> <span data-i18n="pn_title">Đánh Số Trang PDF</span></div>
+            <div class="feature-item"><span class="fi">✨</span> <span data-i18n="pe_title">Làm Rõ PDF</span></div>
+            <div class="feature-item"><span class="fi">🔐</span> <span data-i18n="rd_title">Ẩn Dữ Liệu Nhạy Cảm</span></div>
+            <div class="feature-item"><span class="fi">🔄</span> <span data-i18n="tool_image">Chuyển đổi ảnh</span></div>
+            <div class="feature-item"><span class="fi">📋</span> <span data-i18n="tool_clipboard">Clipboard Cleaner</span></div>
+            <div class="feature-item"><span class="fi">🔑</span> <span data-i18n="tool_password">Tạo Mật Khẩu</span></div>
+            <div class="feature-item"><span class="fi">📝</span> <span data-i18n="tool_word_compare">So Sánh Word</span></div>
+            <div class="feature-item"><span class="fi">📊</span> <span data-i18n="tool_excel_compare">So Sánh Excel</span></div>
+        </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="tech-section">
+        <h2 data-i18n="about_tech_title">⚙️ Công nghệ sử dụng</h2>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <span class="tech-icon">🐍</span>
+                <div>
+                    <div class="tech-name">Python 3.11</div>
+                    <div class="tech-desc">Backend runtime</div>
+                </div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">⚡</span>
+                <div>
+                    <div class="tech-name">FastAPI</div>
+                    <div class="tech-desc">Web framework</div>
+                </div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">📄</span>
+                <div>
+                    <div class="tech-name">PyMuPDF</div>
+                    <div class="tech-desc">PDF processing</div>
+                </div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">👁️</span>
+                <div>
+                    <div class="tech-name">OpenCV</div>
+                    <div class="tech-desc">Image processing</div>
+                </div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">🌐</span>
+                <div>
+                    <div class="tech-name">HTML / CSS / JS</div>
+                    <div class="tech-desc">Frontend</div>
+                </div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">🌍</span>
+                <div>
+                    <div class="tech-name">i18n</div>
+                    <div class="tech-desc" data-i18n="about_tech_i18n">Việt 🇻🇳 + Nhật 🇯🇵</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy -->
+    <div class="privacy-section">
+        <h2 data-i18n="about_privacy_title">🛡️ Chính sách bảo mật</h2>
+        <ul class="privacy-list">
+            <li><span class="pi">✅</span> <span data-i18n="about_priv_1">Tất cả dữ liệu được xử lý trên server nội bộ OVNC — không gửi ra internet</span></li>
+            <li><span class="pi">✅</span> <span data-i18n="about_priv_2">File upload tự động xóa sau khi xử lý xong (trong vòng 10 giây)</span></li>
+            <li><span class="pi">✅</span> <span data-i18n="about_priv_3">Không sử dụng database — không lưu trữ nội dung file hay thông tin cá nhân</span></li>
+            <li><span class="pi">✅</span> <span data-i18n="about_priv_4">Không yêu cầu đăng nhập hay tài khoản</span></li>
+            <li><span class="pi">✅</span> <span data-i18n="about_priv_5">Không quảng cáo, không tracking, không cookies theo dõi</span></li>
+        </ul>
+    </div>
+
+    <!-- Developer -->
+    <div class="dev-card">
+        <div class="avatar">👨‍💻</div>
+        <h3>Việt Đinh</h3>
+        <div class="role">IT Department — OVNC</div>
+        <p class="quote" data-i18n="about_quote">"Công cụ tốt nhất là công cụ giúp bạn hoàn thành công việc nhanh hơn — để dành thời gian cho những điều quan trọng hơn."</p>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener('languageChanged', () => {
+    if (typeof applyLang === 'function') applyLang();
+});
+</script>
+<script src="/static/js/footer.js?v=2.5"></script>
+</body>
+</html>

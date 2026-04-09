@@ -362,6 +362,12 @@ async def clipboard_cleaner_page():
     with open("templates/clipboard_cleaner.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
+# About page
+@app.get("/about", response_class=HTMLResponse)
+async def about_page():
+    with open("templates/about.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
 # Manual cleanup endpoint - người dùng có thể gọi khi kết thúc session
 @app.post("/api/cleanup")
 async def manual_cleanup():
