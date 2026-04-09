@@ -26,7 +26,7 @@ from routers.clipboard_cleaner import router as clipboard_cleaner_router
 from routers.extract_images import router as extract_images_router
 from routers.pdf_page_number import router as pdf_page_number_router
 from routers.pdf_enhance import router as pdf_enhance_router
-from routers.pdf_enhance import router as pdf_enhance_router
+from routers.pdf_redact import router as pdf_redact_router
 
 # Import services
 from services.visitor_tracker import visitor_tracker
@@ -172,6 +172,7 @@ async def track_visitors(request, call_next):
             "/pdf-enhance": "✨ Làm rõ PDF",
             "/pdf-page-number": "🔢 Đánh số trang PDF",
             "/pdf-enhance": "✨ Làm rõ PDF",
+            "/pdf-redact": "🔒 Ẩn dữ liệu nhạy cảm",
         }
         API_NAMES = {
             "/api/split": "✂️ Đang tách PDF",
@@ -192,6 +193,8 @@ async def track_visitors(request, call_next):
             "/api/generate-password": "🔐 Đang tạo mật khẩu",
             "/api/add-page-numbers": "🔢 Đang đánh số trang PDF",
             "/api/enhance-pdf": "✨ Đang làm rõ PDF",
+            "/api/redact-scan": "🔒 Đang quét dữ liệu nhạy cảm",
+            "/api/redact-apply": "🔒 Đang ẩn dữ liệu nhạy cảm",
         }
         
         if path in PAGE_NAMES:
@@ -243,7 +246,7 @@ app.include_router(pdf_enhance_router, prefix="/api", tags=["pdf_enhance"])
 app.include_router(clipboard_cleaner_router, prefix="/api", tags=["clipboard_cleaner"])
 app.include_router(extract_images_router, prefix="/api", tags=["extract_images"])
 app.include_router(pdf_page_number_router, prefix="/api", tags=["pdf_page_number"])
-app.include_router(pdf_enhance_router, prefix="/api", tags=["pdf_enhance"])
+app.include_router(pdf_redact_router, prefix="/api", tags=["pdf_redact"])
 
 # Root route - serve tools.html (main dashboard)
 @app.get("/", response_class=HTMLResponse)
@@ -345,6 +348,12 @@ async def pdf_page_number_page():
 @app.get("/pdf-enhance", response_class=HTMLResponse)
 async def pdf_enhance_page():
     with open("templates/pdf_enhance.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+# PDF Redact page
+@app.get("/pdf-redact", response_class=HTMLResponse)
+async def pdf_redact_page():
+    with open("templates/pdf_redact.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 # Clipboard Cleaner page

@@ -49,6 +49,7 @@ function createHeader() {
               <a href="/extract-images" class="dropdown-item" data-i18n="pei_title">Xuất hình ảnh từ PDF</a>
               <a href="/pdf-page-number" class="dropdown-item" data-i18n="pn_title">Đánh Số Trang PDF</a>
               <a href="/pdf-enhance" class="dropdown-item" data-i18n="pe_title">Làm Rõ PDF</a>
+              <a href="/pdf-redact" class="dropdown-item" data-i18n="rd_title">Ẩn Dữ Liệu Nhạy Cảm</a>
             </div>
           </div>
 

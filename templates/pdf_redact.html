@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="rd_title">Ẩn Dữ Liệu Nhạy Cảm</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.8">
+    <script src="/static/js/i18n.js?v=4.3"></script>
+    <script src="/static/js/header.js?v=2.4"></script>
+    <style>
+        .redact-container { max-width: 900px; margin: 100px auto 40px; padding: 0 20px; }
+        .redact-title { text-align: center; margin-bottom: 8px; font-size: 1.8rem; color: #1a1a2e; }
+        .redact-desc { text-align: center; color: #666; margin-bottom: 30px; }
+
+        /* Upload */
+        .upload-zone { border: 2px dashed #d0d0d0; border-radius: 16px; padding: 50px 30px; text-align: center; cursor: pointer; transition: all .3s; background: #fafbfc; }
+        .upload-zone:hover, .upload-zone.dragover { border-color: #dc3545; background: #fff5f5; }
+        .upload-zone .icon { font-size: 3rem; margin-bottom: 12px; }
+        .upload-zone input { display: none; }
+        .file-info { margin-top: 10px; font-size: .9rem; color: #888; }
+
+        /* Mode Selection */
+        .mode-section { margin-top: 30px; }
+        .mode-section h3 { margin-bottom: 15px; color: #333; }
+        .mode-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .mode-card { border: 2px solid #e0e0e0; border-radius: 12px; padding: 20px 15px; text-align: center; cursor: pointer; transition: all .3s; background: #fff; }
+        .mode-card:hover { border-color: #dc3545; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(220,53,69,.15); }
+        .mode-card.active { border-color: #dc3545; background: #fff5f5; }
+        .mode-card .mode-icon { font-size: 2rem; margin-bottom: 8px; }
+        .mode-card .mode-name { font-weight: 600; color: #333; margin-bottom: 4px; }
+        .mode-card .mode-desc { font-size: .82rem; color: #888; }
+
+        /* Options */
+        .options-panel { margin-top: 25px; background: #f8f9fa; border-radius: 12px; padding: 25px; display: none; }
+        .options-panel.visible { display: block; }
+        .options-panel h4 { margin-bottom: 15px; color: #333; }
+
+        /* Categories checkboxes */
+        .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+        .cat-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; cursor: pointer; transition: all .2s; }
+        .cat-item:hover { border-color: #dc3545; }
+        .cat-item input { accent-color: #dc3545; }
+        .cat-item label { cursor: pointer; font-size: .9rem; }
+
+        /* Keywords input */
+        .keyword-input { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; transition: border-color .3s; }
+        .keyword-input:focus { outline: none; border-color: #dc3545; }
+        .keyword-hint { font-size: .82rem; color: #888; margin-top: 6px; }
+
+        /* Fill color */
+        .color-section { margin-top: 20px; }
+        .color-options { display: flex; gap: 15px; margin-top: 8px; }
+        .color-option { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all .2s; }
+        .color-option:hover { border-color: #dc3545; }
+        .color-option.active { border-color: #dc3545; background: #fff5f5; }
+        .color-swatch { width: 24px; height: 24px; border-radius: 4px; border: 1px solid #ccc; }
+        .color-swatch.black { background: #000; }
+        .color-swatch.white { background: #fff; }
+
+        /* Scan Results */
+        .scan-results { margin-top: 25px; display: none; }
+        .scan-results.visible { display: block; }
+        .scan-summary { background: linear-gradient(135deg, #fff5f5, #ffe0e0); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .scan-summary .count { font-size: 2rem; font-weight: 700; color: #dc3545; }
+        .scan-summary .label { color: #666; }
+        .scan-page { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+        .scan-page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .scan-page-header h5 { color: #333; margin: 0; }
+        .finding-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: .82rem; margin: 3px; }
+        .finding-tag.email { background: #e3f2fd; color: #1565c0; }
+        .finding-tag.phone_vn, .finding-tag.phone_jp { background: #f3e5f5; color: #7b1fa2; }
+        .finding-tag.cccd { background: #fce4ec; color: #c62828; }
+        .finding-tag.bank_account, .finding-tag.credit_card { background: #fff3e0; color: #e65100; }
+        .finding-tag.address_vn { background: #e8f5e9; color: #2e7d32; }
+        .finding-tag.keyword { background: #fff9c4; color: #f57f17; }
+
+        /* Buttons */
+        .btn-row { margin-top: 25px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 14px 30px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all .3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-scan { background: #17a2b8; color: #fff; }
+        .btn-scan:hover:not(:disabled) { background: #138496; }
+        .btn-redact { background: #dc3545; color: #fff; }
+        .btn-redact:hover:not(:disabled) { background: #c82333; }
+        .btn-download { background: #28a745; color: #fff; display: none; }
+        .btn-download:hover { background: #218838; }
+
+        /* Progress */
+        .progress-bar { width: 100%; height: 6px; background: #e9ecef; border-radius: 3px; margin-top: 15px; overflow: hidden; display: none; }
+        .progress-bar.visible { display: block; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #dc3545, #ff6b6b); border-radius: 3px; animation: progress-anim 2s ease-in-out infinite; width: 30%; }
+        @keyframes progress-anim { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
+        .status-text { text-align: center; margin-top: 10px; color: #666; font-size: .9rem; display: none; }
+        .status-text.visible { display: block; }
+
+        /* Result */
+        .result-panel { margin-top: 25px; background: linear-gradient(135deg, #d4edda, #c3e6cb); border-radius: 12px; padding: 25px; text-align: center; display: none; }
+        .result-panel.visible { display: block; }
+        .result-panel h3 { color: #155724; margin-bottom: 10px; }
+        .result-info { color: #333; line-height: 1.8; }
+
+        /* Warning */
+        .warning-box { background: #fff3cd; border: 1px solid #ffc107; border-radius: 10px; padding: 15px; margin-top: 20px; }
+        .warning-box .icon { margin-right: 8px; }
+
+        /* Tips */
+        .tips-box { background: #e8f4fd; border-radius: 10px; padding: 15px 20px; margin-top: 20px; }
+        .tips-box h4 { color: #0c5460; margin-bottom: 8px; }
+        .tips-box p { color: #555; font-size: .9rem; line-height: 1.6; }
+
+        @media (max-width: 768px) {
+            .mode-cards { grid-template-columns: 1fr; }
+            .cat-grid { grid-template-columns: 1fr; }
+            .redact-container { margin-top: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="redact-container">
+    <h1 class="redact-title" data-i18n="rd_title">🔒 Ẩn Dữ Liệu Nhạy Cảm</h1>
+    <p class="redact-desc" data-i18n="rd_desc">Ẩn và xóa vĩnh viễn thông tin nhạy cảm trong file PDF</p>
+
+    <!-- Upload -->
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div class="icon">🔒</div>
+        <p data-i18n="rd_upload_hint">Kéo thả file PDF vào đây hoặc click để chọn</p>
+        <input type="file" id="fileInput" accept=".pdf">
+        <div class="file-info" id="fileInfo"></div>
+    </div>
+
+    <!-- Mode Selection -->
+    <div class="mode-section" id="modeSection" style="display:none">
+        <h3 data-i18n="rd_mode_label">🎯 Chọn chế độ</h3>
+        <div class="mode-cards">
+            <div class="mode-card active" data-mode="auto" onclick="selectMode('auto')">
+                <div class="mode-icon">🔍</div>
+                <div class="mode-name" data-i18n="rd_mode_auto">Tự động phát hiện</div>
+                <div class="mode-desc" data-i18n="rd_mode_auto_desc">Quét và ẩn tự động email, SĐT, CCCD...</div>
+            </div>
+            <div class="mode-card" data-mode="keyword" onclick="selectMode('keyword')">
+                <div class="mode-icon">🔑</div>
+                <div class="mode-name" data-i18n="rd_mode_keyword">Theo từ khóa</div>
+                <div class="mode-desc" data-i18n="rd_mode_keyword_desc">Nhập từ khóa cần ẩn</div>
+            </div>
+            <div class="mode-card" data-mode="both" onclick="selectMode('both')">
+                <div class="mode-icon">⚡</div>
+                <div class="mode-name" data-i18n="rd_mode_both">Kết hợp</div>
+                <div class="mode-desc" data-i18n="rd_mode_both_desc">Tự động + từ khóa</div>
+            </div>
+        </div>
+
+        <!-- Auto detect options -->
+        <div class="options-panel visible" id="autoOptions">
+            <h4 data-i18n="rd_categories">📋 Loại dữ liệu cần phát hiện</h4>
+            <div class="cat-grid">
+                <div class="cat-item">
+                    <input type="checkbox" id="cat_email" value="email" checked>
+                    <label for="cat_email">📧 Email</label>
+                </div>
+                <div class="cat-item">
+                    <input type="checkbox" id="cat_phone_vn" value="phone_vn" checked>
+                    <label for="cat_phone_vn" data-i18n="rd_cat_phone_vn">📱 SĐT Việt Nam</label>
+                </div>
+                <div class="cat-item">
+                    <input type="checkbox" id="cat_phone_jp" value="phone_jp" checked>
+                    <label for="cat_phone_jp" data-i18n="rd_cat_phone_jp">📱 SĐT Nhật Bản</label>
+                </div>
+                <div class="cat-item">
+                    <input type="checkbox" id="cat_cccd" value="cccd" checked>
+                    <label for="cat_cccd" data-i18n="rd_cat_cccd">🪪 CMND / CCCD</label>
+                </div>
+                <div class="cat-item">
+                    <input type="checkbox" id="cat_bank" value="bank_account" checked>
+                    <label for="cat_bank" data-i18n="rd_cat_bank">🏦 Số tài khoản</label>
+                </div>
+                <div class="cat-item">
+                    <input type="checkbox" id="cat_card" value="credit_card" checked>
+                    <label for="cat_card" data-i18n="rd_cat_card">💳 Số thẻ</label>
+                </div>
+                <div class="cat-item">
+                    <input type="checkbox" id="cat_address" value="address_vn">
+                    <label for="cat_address" data-i18n="rd_cat_address">📍 Địa chỉ</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyword options -->
+        <div class="options-panel" id="keywordOptions">
+            <h4 data-i18n="rd_keyword_label">🔑 Nhập từ khóa cần ẩn</h4>
+            <input type="text" class="keyword-input" id="keywordInput"
+                   placeholder="VD: Nguyen Van A, 0123456789, abc@email.com">
+            <p class="keyword-hint" data-i18n="rd_keyword_hint">Phân cách bằng dấu phẩy (,) — Không phân biệt hoa/thường</p>
+        </div>
+
+        <!-- Fill color -->
+        <div class="color-section">
+            <h4 data-i18n="rd_fill_color">🎨 Kiểu che</h4>
+            <div class="color-options">
+                <div class="color-option active" data-color="black" onclick="selectColor('black')">
+                    <div class="color-swatch black"></div>
+                    <span data-i18n="rd_color_black">Hộp đen</span>
+                </div>
+                <div class="color-option" data-color="white" onclick="selectColor('white')">
+                    <div class="color-swatch white"></div>
+                    <span data-i18n="rd_color_white">Hộp trắng</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning -->
+        <div class="warning-box">
+            <span class="icon">⚠️</span>
+            <strong data-i18n="rd_warning_title">Cảnh báo:</strong>
+            <span data-i18n="rd_warning_text">Dữ liệu sau khi ẩn sẽ bị xóa VĨNH VIỄN khỏi file PDF. Không thể khôi phục. Hãy giữ bản gốc nếu cần.</span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-row">
+            <button class="btn btn-scan" id="btnScan" onclick="scanPdf()" data-i18n="rd_btn_scan">🔍 Quét trước</button>
+            <button class="btn btn-redact" id="btnRedact" onclick="applyRedact()" data-i18n="rd_btn_redact">🔒 Ẩn dữ liệu</button>
+        </div>
+
+        <div class="progress-bar" id="progressBar"><div class="progress-fill"></div></div>
+        <div class="status-text" id="statusText" data-i18n="rd_processing">Đang xử lý...</div>
+
+        <!-- Scan Results -->
+        <div class="scan-results" id="scanResults">
+            <div class="scan-summary">
+                <div class="count" id="totalCount">0</div>
+                <div class="label" data-i18n="rd_found_items">mục nhạy cảm được phát hiện</div>
+            </div>
+            <div id="scanPages"></div>
+        </div>
+
+        <!-- Result -->
+        <div class="result-panel" id="resultPanel">
+            <h3 data-i18n="rd_success">✅ Ẩn dữ liệu thành công!</h3>
+            <div class="result-info" id="resultInfo"></div>
+            <div class="btn-row">
+                <button class="btn btn-download" id="btnDownload" style="display:inline-flex" onclick="downloadResult()" data-i18n="rd_btn_download">⬇ Tải xuống</button>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="tips-box">
+            <h4 data-i18n="rd_tips_title">💡 Lưu ý quan trọng</h4>
+            <p data-i18n="rd_tips_content">• Chức năng này XÓA VĨNH VIỄN dữ liệu khỏi PDF — không thể copy, search hay khôi phục. • Nên "Quét trước" để xem dữ liệu sẽ bị ẩn trước khi áp dụng. • Hỗ trợ phát hiện: email, số điện thoại VN/JP, CMND/CCCD, số tài khoản ngân hàng, số thẻ.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedFile = null;
+let currentMode = 'auto';
+let selectedColor = 'black';
+let downloadUrl = null;
+let downloadName = '';
+
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+
+// Drag & drop
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+        alert('Only PDF files are supported');
+        return;
+    }
+    selectedFile = file;
+    const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+    document.getElementById('fileInfo').textContent = `📄 ${file.name} (${sizeMB} MB)`;
+    document.getElementById('modeSection').style.display = 'block';
+    // Reset states
+    document.getElementById('scanResults').classList.remove('visible');
+    document.getElementById('resultPanel').classList.remove('visible');
+}
+
+function selectMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+    document.querySelector(`.mode-card[data-mode="${mode}"]`).classList.add('active');
+
+    const autoOpts = document.getElementById('autoOptions');
+    const kwOpts = document.getElementById('keywordOptions');
+
+    if (mode === 'auto') {
+        autoOpts.classList.add('visible');
+        kwOpts.classList.remove('visible');
+    } else if (mode === 'keyword') {
+        autoOpts.classList.remove('visible');
+        kwOpts.classList.add('visible');
+    } else {
+        autoOpts.classList.add('visible');
+        kwOpts.classList.add('visible');
+    }
+}
+
+function selectColor(color) {
+    selectedColor = color;
+    document.querySelectorAll('.color-option').forEach(c => c.classList.remove('active'));
+    document.querySelector(`.color-option[data-color="${color}"]`).classList.add('active');
+}
+
+function getSelectedCategories() {
+    return Array.from(document.querySelectorAll('.cat-grid input:checked')).map(cb => cb.value);
+}
+
+function showProgress(show) {
+    document.getElementById('progressBar').classList.toggle('visible', show);
+    document.getElementById('statusText').classList.toggle('visible', show);
+}
+
+function getCategoryLabel(cat) {
+    const labels = {
+        email: '📧 Email', phone_vn: '📱 SĐT VN', phone_jp: '📱 SĐT JP',
+        cccd: '🪪 CCCD', bank_account: '🏦 Tài khoản', credit_card: '💳 Thẻ',
+        address_vn: '📍 Địa chỉ', keyword: '🔑 Từ khóa'
+    };
+    return labels[cat] || cat;
+}
+
+async function scanPdf() {
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('mode', currentMode === 'keyword' ? 'keyword' : 'auto');
+    formData.append('keywords', document.getElementById('keywordInput').value);
+    formData.append('categories', getSelectedCategories().join(','));
+
+    showProgress(true);
+    document.getElementById('btnScan').disabled = true;
+
+    try {
+        const resp = await fetch('/api/redact-scan', { method: 'POST', body: formData });
+        if (!resp.ok) throw new Error(await resp.text());
+        const data = await resp.json();
+
+        // Show results
+        let totalCount = 0;
+        let pagesHtml = '';
+
+        data.pages.forEach(page => {
+            if (page.count === 0) return;
+            totalCount += page.count;
+
+            const tags = page.findings.map(f =>
+                `<span class="finding-tag ${f.category}">${getCategoryLabel(f.category)}: ${f.text.length > 30 ? f.text.substring(0,30)+'...' : f.text}</span>`
+            ).join('');
+
+            const pageLabel = typeof t === 'function' ? t('rd_page') || 'Trang' : 'Trang';
+            pagesHtml += `<div class="scan-page">
+                <div class="scan-page-header">
+                    <h5>${pageLabel} ${page.page}</h5>
+                    <span>${page.count} items</span>
+                </div>
+                <div>${tags}</div>
+            </div>`;
+        });
+
+        document.getElementById('totalCount').textContent = totalCount;
+        document.getElementById('scanPages').innerHTML = pagesHtml;
+        document.getElementById('scanResults').classList.add('visible');
+
+        // If combined mode, also scan keywords
+        if (currentMode === 'both' && document.getElementById('keywordInput').value.trim()) {
+            const formData2 = new FormData();
+            formData2.append('file', selectedFile);
+            formData2.append('mode', 'keyword');
+            formData2.append('keywords', document.getElementById('keywordInput').value);
+
+            const resp2 = await fetch('/api/redact-scan', { method: 'POST', body: formData2 });
+            if (resp2.ok) {
+                const data2 = await resp2.json();
+                data2.pages.forEach(page => {
+                    if (page.count === 0) return;
+                    totalCount += page.count;
+                    const tags = page.findings.map(f =>
+                        `<span class="finding-tag keyword">🔑 ${f.text}</span>`
+                    ).join('');
+                    const pageLabel = typeof t === 'function' ? t('rd_page') || 'Trang' : 'Trang';
+                    document.getElementById('scanPages').innerHTML += `<div class="scan-page">
+                        <div class="scan-page-header"><h5>${pageLabel} ${page.page} (keyword)</h5><span>${page.count}</span></div>
+                        <div>${tags}</div>
+                    </div>`;
+                });
+                document.getElementById('totalCount').textContent = totalCount;
+            }
+        }
+
+    } catch (err) {
+        alert('Error: ' + err.message);
+    } finally {
+        showProgress(false);
+        document.getElementById('btnScan').disabled = false;
+    }
+}
+
+async function applyRedact() {
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('fill_color', selectedColor);
+
+    if (currentMode === 'keyword') {
+        formData.append('mode', 'keyword');
+        formData.append('keywords', document.getElementById('keywordInput').value);
+    } else if (currentMode === 'both') {
+        // For combined mode: first do auto, then keywords
+        formData.append('mode', 'auto');
+        formData.append('categories', getSelectedCategories().join(','));
+        formData.append('keywords', document.getElementById('keywordInput').value);
+    } else {
+        formData.append('mode', 'auto');
+        formData.append('categories', getSelectedCategories().join(','));
+    }
+
+    showProgress(true);
+    document.getElementById('statusText').setAttribute('data-i18n', 'rd_processing');
+    if (typeof applyLang === 'function') applyLang();
+    document.getElementById('btnRedact').disabled = true;
+
+    try {
+        const resp = await fetch('/api/redact-apply', { method: 'POST', body: formData });
+        if (!resp.ok) throw new Error(await resp.text());
+
+        const totalRedacted = resp.headers.get('X-Total-Redacted') || '0';
+        const totalPages = resp.headers.get('X-Total-Pages') || '0';
+        const origSize = (parseInt(resp.headers.get('X-Original-Size') || 0) / 1024 / 1024).toFixed(2);
+        const newSize = (parseInt(resp.headers.get('X-New-Size') || 0) / 1024 / 1024).toFixed(2);
+
+        const blob = await resp.blob();
+        downloadUrl = URL.createObjectURL(blob);
+        downloadName = selectedFile.name.replace('.pdf', '_redacted.pdf');
+
+        // If combined mode, apply keywords too on the redacted file
+        if (currentMode === 'both' && document.getElementById('keywordInput').value.trim()) {
+            const kwForm = new FormData();
+            kwForm.append('file', blob, downloadName);
+            kwForm.append('mode', 'keyword');
+            kwForm.append('keywords', document.getElementById('keywordInput').value);
+            kwForm.append('fill_color', selectedColor);
+
+            const resp2 = await fetch('/api/redact-apply', { method: 'POST', body: kwForm });
+            if (resp2.ok) {
+                const blob2 = await resp2.blob();
+                if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+                downloadUrl = URL.createObjectURL(blob2);
+            }
+        }
+
+        const infoEl = document.getElementById('resultInfo');
+        const resultTpl = typeof t === 'function' ? t('rd_result_info') : null;
+        if (resultTpl) {
+            infoEl.innerHTML = resultTpl.replace('{count}', totalRedacted).replace('{pages}', totalPages).replace('{orig}', origSize).replace('{new}', newSize);
+        } else {
+            infoEl.innerHTML = `🔒 ${totalRedacted} mục đã ẩn trên ${totalPages} trang<br>📦 ${origSize} MB → ${newSize} MB`;
+        }
+
+        document.getElementById('resultPanel').classList.add('visible');
+        document.getElementById('scanResults').classList.remove('visible');
+
+    } catch (err) {
+        alert('Error: ' + err.message);
+    } finally {
+        showProgress(false);
+        document.getElementById('btnRedact').disabled = false;
+    }
+}
+
+function downloadResult() {
+    if (!downloadUrl) return;
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = downloadName;
+    a.click();
+}
+
+// i18n support
+document.addEventListener('languageChanged', () => {
+    if (typeof applyLang === 'function') applyLang();
+});
+</script>
+
+<script src="/static/js/footer.js?v=2.5"></script>
+</body>
+</html>
